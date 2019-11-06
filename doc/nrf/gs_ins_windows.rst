@@ -337,17 +337,48 @@ Complete the following steps to set up the |SES| environment:
 
        Open nRF Connect SDK Project menu
 
-#. Set the Zephyr Base directory to the full path to ``ncs\zephyr``.
-   The GNU ARM Embedded Toolchain directory is the directory where you installed the toolchain (for example, ``c:\gnuarmemb``).
+#. Set the Zephyr Base directory to the full path to ``ncs/zephyr``.
+   The GNU ARM Embedded Toolchain directory is the directory where you installed the toolchain (for example, ``c:/gnuarmemb``).
 
     .. figure:: images/ses_notset.png
        :alt: Zephyr Base Not Set prompt
 
        Zephyr Base Not Set prompt
 
+.. buildenv_end
 
-If you want to change these settings later, click :guilabel:`Tools` -> :guilabel:`Options` and select the :guilabel:`nRF Connect` tab (see :ref:`ses_options_figure`).
+.. buildenv_path_start
 
+4. Make sure the locations of tools are added to the PATH variable.
+On Windows and Linux, SES uses the PATH variable to find executables.
+
+.. buildenv_path_end
+
+.. _build_environment_settings_changes_win:
+
+.. buildenv_settings_changes_start
+
+Changing the SES environment settings
+-------------------------------------
+
+If you want to change the SES environment settings later, click :guilabel:`Tools` -> :guilabel:`Options` and select the :guilabel:`nRF Connect` tab, as shown on the following figure from the Windows installation.
+
+.. _ses_options_figure:
+
+.. figure:: images/ses_options.png
+     :alt: nRF Connect SDK options in SES on Windows
+
+     nRF Connect SDK options in SES (Windows)
+
+Changing the SES environment settings might require modifying the the PATH variable.
+If you get an error that a tool or command cannot be found, first make sure that the tool is installed.
+If it is installed, verify its location is correct in the PATH variable.
+
+.. buildenv_settings_changes_end
+
+.. _build_environment_cli_win:
+
+.. buildenv_cli_start
 
 Setting up the command line build environment
 =============================================
@@ -359,4 +390,4 @@ To define the environment variables, navigate to the ``ncs`` folder and enter th
 If you need to define additional environment variables, create the file |rcfile| and add the variables there.
 This file is loaded automatically when you run the above command.
 
-.. buildenv_end
+.. buildenv_cli_end
