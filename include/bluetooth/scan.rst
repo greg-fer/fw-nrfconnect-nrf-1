@@ -3,7 +3,7 @@
 Scanning module
 ###############
 
-The Scanning Module handles the BLE scanning for your application. You can use it to find an advertising device and establish a connection with it. The scan can be narrowed down to the device of a specific type by using filters.
+The Scanning Module handles the |BLE| scanning for your application. You can use it to find an advertising device and establish a connection with it. The scan can be narrowed down to the device of a specific type by using filters.
 
 The Scanning Module can work in one of the following modes:
 

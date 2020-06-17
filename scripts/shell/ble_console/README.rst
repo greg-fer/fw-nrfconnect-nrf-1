@@ -1,9 +1,9 @@
 .. _ble_console_readme:
 
-BLE Console
-###########
+|BLE| Console
+#############
 
-BLE Console is a desktop application that can be used to communicate with an nRF
+|BLE| Console is a desktop application that can be used to communicate with an nRF
 device over *Bluetooth* Low Energy using the :ref:`shell_bt_nus_readme`.
 
 The application supports Linux only and cannot be run on Windows.

@@ -161,9 +161,9 @@ Bluetooth Low Energy
 * Added the following libraries:
 
   * :ref:`nrf_bt_scan_readme`:
-    This library handles BLE scanning for your application.
+    This library handles |BLE| scanning for your application.
   * :ref:`gatt_dm_readme`:
-    This library handles service discovery on BLE GATT servers.
+    This library handles service discovery on |BLE| GATT servers.
   * :ref:`nus_c_readme`:
     This library can be used to act as a NUS Client.
 

@@ -325,8 +325,8 @@ Updated libraries
   * Integrated with :ref:`nrf_cc310_platform_readme` and :ref:`nrf_cc310_mbedcrypto_readme` version 0.9.1.
 
 
-nRF BLE Controller
-==================
+nRF |BLE| Controller
+====================
 
 * Updated the :ref:`nrfxlib:ble_controller` to v0.3.0-3.prealpha.
   For details, see the :ref:`nrfxlib:ble_controller_changelog`.
@@ -523,7 +523,7 @@ Bluetooth Low Energy
 * The central samples (:ref:`central_uart`, :ref:`bluetooth_central_hids`) do not support any pairing methods with MITM protection.
 * On some operating systems, the nrf_desktop application is unable to reconnect to a host.
 * central_uart: A too long 212-byte string cannot be handled when entered to the console to send to peripheral_uart.
-* On nRF51 devices, BLE samples that use GPIO might crash when buttons are pressed frequently.
+* On nRF51 devices, |BLE| samples that use GPIO might crash when buttons are pressed frequently.
   In such case, the GPIO ISR introduces latency that violates real-time requirements of the Radio ISR.
   nRF51 is more sensitive to this issue than nRF52 (faster core).
 

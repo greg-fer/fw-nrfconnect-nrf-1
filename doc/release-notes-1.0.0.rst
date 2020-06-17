@@ -15,7 +15,7 @@ Highlights
 * Added a new AWS FOTA sample demonstrating application firmware update through the use of AWS IoT Jobs with MQTT and HTTP.
 * Added secure services in Secure Partition Manager (SPM) for TrustZone devices (nRF9160).
 * Updated the Download Client library with support for HTTPS and IPv6.
-* Included a new version of the nRF BLE Controller.
+* Included a new version of the nRF |BLE| Controller.
 
 Release tag
 ***********
@@ -158,10 +158,10 @@ Crypto
 
 * Added :ref:`nrfxlib:nrf_cc310_mbedcrypto_readme` library v0.8.1 (experimental release) to perform hardware-accelerated cryptography using Arm CryptoCell CC310 on devices with the CC310 peripheral.
 
-nRF BLE Controller
-==================
+nRF |BLE| Controller
+====================
 
-* Added support for the nRF BLE controller 0.2.0-4.prealpha. Includes drivers to access HCI, flash, clock control, and entropy hardware.
+* Added support for the nRF |BLE| controller 0.2.0-4.prealpha. Includes drivers to access HCI, flash, clock control, and entropy hardware.
   For details, see :ref:`nrfxlib:ble_controller_changelog`.
 
 Subsystems
@@ -244,7 +244,7 @@ Documentation
 
 * Added or updated the following documentation:
 
-  * nRF BLE Controller (experimental)
+  * nRF |BLE| Controller (experimental)
   * :ref:`ug_multi_image`
   * :ref:`partition_manager`
   * :ref:`nrf_desktop`
@@ -286,8 +286,8 @@ Bluetooth Low Energy
 * The central samples (:ref:`central_uart`, :ref:`bluetooth_central_hids`) do not support any pairing methods with MITM protection.
 * On some operating systems, the nrf_desktop application is unable to reconnect to a host.
 * central_uart: A too long 212-byte string cannot be handled when entered to the console to send to peripheral_uart.
-* central_hids: After flashing a HEX file to the nrf52_pca10040 board, UART connectivity is lost when using the BLE Controller. The board must be reset to get UART output.
-* On nRF51 devices, BLE samples that use GPIO might crash when buttons are pressed frequently. In such case, the GPIO ISR introduces latency that violates real-time requirements of the Radio ISR. nRF51 is more sensitive to this issue than nRF52 (faster core).
+* central_hids: After flashing a HEX file to the nrf52_pca10040 board, UART connectivity is lost when using the |BLE| Controller. The board must be reset to get UART output.
+* On nRF51 devices, |BLE| samples that use GPIO might crash when buttons are pressed frequently. In such case, the GPIO ISR introduces latency that violates real-time requirements of the Radio ISR. nRF51 is more sensitive to this issue than nRF52 (faster core).
 
 Bootloader
 ----------

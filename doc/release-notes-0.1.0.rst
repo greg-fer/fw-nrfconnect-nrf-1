@@ -52,7 +52,7 @@ The following sections provide detailed lists of changes by component.
 Bluetooth Low Energy
 ====================
 
-The following samples that work with the Zephyr BLE Controller have been added:
+The following samples that work with the Zephyr |BLE| Controller have been added:
 
 * :ref:`peripheral_lbs` - sample server implementation using a proprietary vendor-specific UUID.
 * :ref:`peripheral_uart` - sample server implementation using a proprietary vendor-specific UUID.

@@ -3,9 +3,9 @@
 Nordic UART Service (NUS)
 #########################
 
-The BLE GATT Nordic UART Service is a custom service that receives and writes data and serves as a bridge to the UART interface.
+The Nordic UART Service for |BLE| GATT is a custom service that receives and writes data and serves as a bridge to the UART interface.
 
-The NUS Service is used in the :ref:`peripheral_uart` sample.
+The NUS is used in the :ref:`peripheral_uart` sample.
 
 Service UUID
 ************

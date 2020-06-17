@@ -26,8 +26,8 @@ Supported devices
 
 This library supports both PTM 215B-based switches and the BLE-enabled sensor module:
 
-* `Easyfit Single/Double Rocker Wall Switch for BLE - EWSSB/EWSDB`_
-* `Easyfit Single/Double Rocker Pad for BLE - ESRPB/EDRPB`_
+* `Easyfit Single/Double Rocker Wall Switch for |BLE| - EWSSB/EWSDB`_
+* `Easyfit Single/Double Rocker Pad for |BLE| - ESRPB/EDRPB`_
 * `Easyfit Motion Detector with Illumination Sensor - EMDCB`_
 
 By default, the library supports one EnOcean device, and the :ref:`enocean_sample` sample supports only up to four devices.

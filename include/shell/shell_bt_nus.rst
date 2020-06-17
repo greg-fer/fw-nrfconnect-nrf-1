@@ -3,15 +3,15 @@
 Nordic UART Service (NUS) shell transport
 #########################################
 
-The BLE GATT Nordic UART Service shell transport allows to receive shell commands remotely over *Bluetooth*.
+The Nordic UART Service shell transport for |BLE| GATT allows to receive shell commands remotely over *Bluetooth*.
 It uses the :ref:`nus_service_readme`.
 
-The NUS Service shell transport is used in the :ref:`shell_bt_nus` sample.
+The NUS shell transport is used in the :ref:`shell_bt_nus` sample.
 
 Setup
 *****
 
-Enable NUS shell transport in your application to be able to receive shell commands remotely.
+Enable the NUS shell transport in your application to be able to receive shell commands remotely.
 
 To send shell commands to an application that uses this module, you need specific software, comparable to a terminal (for example, PuTTY) for UART communication.
 
