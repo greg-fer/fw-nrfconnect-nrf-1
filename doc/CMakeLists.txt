@@ -196,16 +196,23 @@ if(NOT DEFINED ENV{NRFX_BASE})
   set(ENV{NRFX_BASE} ${NRFX_BASE})
 endif()
 
+if(NOT DEFINED ENV{MATTER_BASE})
+  get_filename_component(MATTER_BASE ${CMAKE_CURRENT_LIST_DIR}/../../modules/lib/matter/ REALPATH)
+  set(ENV{MATTER_BASE} ${MATTER_BASE})
+endif()
+
 message(STATUS "ZEPHYR_BASE: ${ZEPHYR_BASE}")
 message(STATUS "NRF_BASE: $ENV{NRF_BASE}")
 message(STATUS "MCUBOOT_BASE: $ENV{MCUBOOT_BASE}")
 message(STATUS "NRFXLIB_BASE: $ENV{NRFXLIB_BASE}")
 message(STATUS "NRFX_BASE: $ENV{NRFX_BASE}")
+message(STATUS "MATTER_BASE: $ENV{MATTER_BASE}")
 
 set(ZEPHYR_BINARY_DIR ${CMAKE_BINARY_DIR}/zephyr)
 set(NRF_BINARY_DIR ${CMAKE_BINARY_DIR}/nrf)
 set(NRFXLIB_BINARY_DIR ${CMAKE_BINARY_DIR}/nrfxlib)
 set(NRFX_BINARY_DIR ${CMAKE_BINARY_DIR}/nrfx)
+set(MATTER_BINARY_DIR ${CMAKE_BINARY_DIR}/matter)
 
 # HTML output directory
 set(HTML_DIR ${CMAKE_BINARY_DIR}/html)
@@ -302,6 +309,17 @@ set(mcuboot_env
 )
 
 add_docset(mcuboot "${mcuboot_env}")
+
+#-------------------------------------------------------------------------------
+# docset: matter
+
+set(matter_env
+  NRF_BASE=${NRF_BASE}
+  MATTER_BASE=${MATTER_BASE}
+  MATTER_BUILD=${MATTER_BINARY_DIR}
+)
+
+add_docset(matter "${matter_env}")
 
 #-------------------------------------------------------------------------------
 # docset: nrfx
@@ -414,6 +432,7 @@ add_dependencies(build-all
     copy-extra-content
     nrf-html-all
     nrfx-html-all
+    matter-html-all
     nrfxlib-html-all
     zephyr-html-all
     mcuboot-html-all
