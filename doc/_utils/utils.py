@@ -6,7 +6,7 @@ from typing import Dict, Tuple, Optional
 
 ALL_DOCSETS = {
     "nrf": ("nRF Connect SDK", "index"),
-    "matter": ("matter", "index"),
+    "matter": ("matter", "README"),
     "nrfx": ("nrfx", "index"),
     "nrfxlib": ("nrfxlib", "README"),
     "zephyr": ("Zephyr Project", "index"),
