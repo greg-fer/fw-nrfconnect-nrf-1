@@ -51,6 +51,7 @@ Following are the available documentation sets:
 - ``zephyr``: Zephyr RTOS
 - ``mcuboot``: MCUboot
 - ``tfm``: Trusted Firmware-M
+- ``matter``: Matter
 - ``kconfig``: All available Kconfig options in the |NCS|
 
 Since there are links from the |NCS| documentation set into other documentation sets, the documentation is built in a predefined order.

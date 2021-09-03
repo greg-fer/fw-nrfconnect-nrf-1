@@ -97,7 +97,7 @@ This system generates the Ninja files that the |NCS| uses.
 
       1. Download the latest version of the GN binary archive for Windows from the `GN website`_.
       2. Extract the :file:`zip` archive.
-      3. Ensure that the GN tool is added to your :envvar:`PATH` environment variable.
+      3. Check that the GN tool is added to your :envvar:`PATH` environment variable.
          See :ref:`zephyr:env_vars` for instructions if needed.
 
    .. group-tab:: Linux
