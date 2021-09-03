@@ -165,7 +165,7 @@ This option provides most of the functionalities available in the OpenThread Bor
 However, this approach requires you to download the OpenThread Border Router repository and install the Border Router manually on the Raspberry Pi.
 
 To set up and configure the OpenThread Border Router, follow the official `OpenThread Border Router Codelab tutorial`_ on the OpenThread documentation portal.
-After cloning the repository, ensure to check out the compatible commit id:
+After cloning the repository, make sure to check out the compatible commit id:
 
    .. code-block:: console
 

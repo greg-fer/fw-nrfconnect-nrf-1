@@ -386,7 +386,7 @@ To set up the toolchain, complete the following steps:
    The recommended folder is :file:`c:\gnuarmemb` on Windows and :file:`~/gnuarmemb` on Linux or macOS.
    Make sure that the folder name does not contain any spaces or special characters.
    By default, the contents are extracted to another folder that corresponds to the GNU Arm Embedded Toolchain version (*version-folder* in the following step).
-   For example, :file:`c:\gccarmemb\10_2021.07`, where :file:`10_2021.07` is the *version-folder* name edited to contain no empty spaces.
+   For example, :file:`c:\gccarmemb\9_2019-q4-major`, where :file:`9_2019-q4-major` is the *version-folder* name edited to contain no empty spaces.
 #. If you want to build and program applications from the command line, define the environment variables for the GNU Arm Embedded Toolchain.
    Depending on your operating system:
 
