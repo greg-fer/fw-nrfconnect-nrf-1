@@ -22,7 +22,7 @@ The following tool versions have been tested to work:
 * Doxygen 1.9.2
 * Mscgen 0.20
 * PlantUML
-* Python dependencies as listed in :ref:`python_req_documentation`
+* Python dependencies as listed in :ref:`python_req_documentation` on the Requirements page
 
 Complete the following steps to install the required tools:
 
