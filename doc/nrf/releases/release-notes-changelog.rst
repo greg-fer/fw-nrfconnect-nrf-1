@@ -63,11 +63,11 @@ The following list summarizes the most important changes inherited from upstream
 Mcumgr
 ======
 
-The mcumgr library contains all commits from the upstream mcumgr repository up to and including snapshot ``74e77ad08``.
+The mcumgr library contains all commits from the upstream mcumgr repository up to and including snapshot ``e64f5060b``.
 
 The following list summarizes the most important changes inherited from upstream mcumgr:
 
-* No changes yet
+* Fixes issue with SMP file management commands failing to read/write files.
 
 Zephyr
 ======
