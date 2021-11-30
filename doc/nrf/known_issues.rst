@@ -993,13 +993,6 @@ NCSDK-10672: :file:`dfu_application.zip` is not updated during build
 
   **Workaround:** Clear the build if :file:`dfu_application.zip` is going to be released to make sure that it is up to date.
 
-.. rst-class:: v1-6-1 v1-6-0 v1-5-1 v1-5-0
-
-Missing files or permissions when building on Windows
-  Because of the Windows path length limitations, the build can fail with errors related to permissions or missing files if some paths in the build are too long.
-
-  **Workaround:** Shorten the build folder name, for example, from "build_nrf5340dk_nrf5340_cpuapp_ns" to "build", or shorten the path to the build folder in some other way.
-
 .. rst-class:: v1-4-2 v1-4-1 v1-4-0
 
 NCSDK-6898: Overriding child images
@@ -1355,7 +1348,7 @@ DRGN-16317: The SoftDevice Controller may discard LE Extended Advertising Report
 
 .. rst-class:: v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0 v1-4-2 v1-4-1 v1-4-0 v1-3-2 v1-3-1 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
-DRGN-16341: The Sofdevice Controller may discard LE Extended Advertising Reports
+DRGN-16341: The SoftDevice Controller may discard LE Extended Advertising Reports
   Extended Advertising Reports with data length of 228 are discarded.
 
 .. rst-class:: v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0 v1-4-2 v1-4-1 v1-4-0 v1-3-2 v1-3-1 v1-3-0
@@ -1749,7 +1742,7 @@ NCSDK-6852: Extra CMake options might not be applied in version 5.10d
 
   **Workaround:** Select ``NONE (Use SES settings / environment PATH)`` from the :guilabel:`nRF Connect Toolchain Version` drop-down if you want to specify :guilabel:`Extra CMake Build Options`.
 
-.. rst-class:: v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0 v1-4-2 v1-4-1 v1-4-0
+.. rst-class:: v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0 v1-4-2 v1-4-1 v1-4-0
 
 NCSDK-8372: Project name collision causes SES Nordic Edition to load the wrong project
   Some samples that are located in different folders use the same project name.
@@ -1761,25 +1754,13 @@ NCSDK-8372: Project name collision causes SES Nordic Edition to load the wrong p
   **Workaround:** If the path in :guilabel:`Build Directory` points to the wrong project, select the correct project by using the :guilabel:`...` button for :guilabel:`Projects` and navigating to the correct project location.
   The build directory will update automatically.
 
-.. rst-class:: v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0
+.. rst-class:: v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0
 
-NCSDK-9992: Multiple extra CMake options applied as single option.
+NCSDK-9992: Multiple extra CMake options applied as single option
   If you specify two or more :guilabel:`Extra CMake Build Options` in the :guilabel:`Open nRF Connect SDK Project` dialog, those will be incorrectly treated as one option where the second option becomes a value to the first.
   For example: ``-DFOO=foo -DBAR=bar`` will define the CMake variable ``FOO`` having the value ``foo -DBAR=bar``.
 
   **Workaround:** Create a CMake preload script containing ``FOO`` and ``BAR`` settings, and then specify ``-C <pre-load-script>.cmake`` in :guilabel:`Extra CMake Build Options`.
-
-Toolchain
-*********
-
-.. rst-class:: v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-1 v1-5-0
-
-Some versions of the GNU Arm Embedded toolchain do not work correctly when building samples based on TF-M
-  The GNU Arm Embedded Toolchain versions *9-2020-q2-update* and *10-2020-q4-major* do not work correctly when compiling binaries for Cortex-M Secure Extensions.
-  This issue affects all the samples based on TF-M.
-  For more information, see `here <https://github.com/zephyrproject-rtos/zephyr/issues/34658#issuecomment-828422111>`_.
-
-  **Workaround:** When building with TF-M, use the version of the toolchain that is recommended for the given |NCS| version and listed on the :ref:`gs_recommended_versions` page.
 
 ----
 
