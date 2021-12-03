@@ -445,6 +445,32 @@ KRKNWK-12115: Simultaneous commissioning of many devices can cause the Coordinat
   The Zigbee Coordinator device can assert when multiple devices are being commissioned simultaneously.
   In some cases, the device can end up in the low memory state as the result.
 
+  To lower likelihood of Coordinator device asserting, increase its scheduler queue and buffer pool:
+
+  1. Create your own custom memory configuration file - create empty header file for your application, similarly to ``include/zb_mem_config_custom.h`` header file in :ref:`Zigbee light switch <zigbee_light_switch_sample>` sample.
+  #. Zigbee Network Coordinator sample uses ``zb_mem_config_max.h`` memory configuration file by default - copy its contents to your own memory configuration file.
+  #. In your custom memory configuration file, replace the following code with code below:
+
+  .. code-block:: c
+
+     /* Now if you REALLY know what you do, you can study zb_mem_config_common.h and redefine some configuration parameters, like:
+     #undef ZB_CONFIG_SCHEDULER_Q_SIZE
+     #define ZB_CONFIG_SCHEDULER_Q_SIZE 56
+     */
+
+  .. code-block:: c
+
+     /* Increase Scheduler queue size. */
+     undef ZB_CONFIG_SCHEDULER_Q_SIZE
+     define ZB_CONFIG_SCHEDULER_Q_SIZE XXX
+     /* Increase buffer pool size. */
+     undef ZB_CONFIG_IOBUF_POOL_SIZE
+     define ZB_CONFIG_IOBUF_POOL_SIZE XXX
+
+  #. To increase scheduler queue size - for ``ZB_CONFIG_SCHEDULER_Q_SIZE``, change ``XXX`` to value of your choice, from ``48U`` up to ``256U``.
+  #. To increase buffer pool size - for ``ZB_CONFIG_IOBUF_POOL_SIZE``, change ``XXX`` to value of your choice, from ``48U`` up to ``127U``.
+
+
 .. rst-class:: v1-8-0
 
 KRKNWK-11826: Zigbee Router does not accept new child devices if the maximum number of children is reached
