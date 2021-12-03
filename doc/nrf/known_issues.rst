@@ -407,6 +407,38 @@ Zigbee
 KRKNWK-11465: OTA Client issues in the Image Block Request
   OTA Client cannot send Image Block Request with ``MinimumBlockPeriod`` attribute value set to ``0``.
 
+**Workaround**: Complete the following steps to mitigate this issue:
+
+  1. Restore default MinimumBlockPeriod attribute value - add the snippet below in ``zigbee_fota.c`` file in:
+
+     a. ``zigbee_fota_abort()`` function
+     #. ``zigbee_fota_zcl_cb()`` function in case handling ``ZB_ZCL_OTA_UPGRADE_STATUS_FINISH`` status
+
+  See the following snippet for an example:
+
+  .. code-block:: c
+
+     /* Variable that store new value for MinimumBlockPeriod attribute. */
+     zb_uint16_t minimum_block_period_new_value = NEW_VALUE;
+     /* Set attribute value. */
+     zb_uint8_t status = zb_zcl_set_attr_val(
+             CONFIG_ZIGBEE_FOTA_ENDPOINT,
+             ZB_ZCL_CLUSTER_ID_OTA_UPGRADE,
+             ZB_ZCL_CLUSTER_CLIENT_ROLE,
+             ZB_ZCL_ATTR_OTA_UPGRADE_MIN_BLOCK_REQUE_ID,
+             (zb_uint8_t*)&minimum_block_period_new_value,
+             ZB_FALSE);
+     /* Check if new value was set correctly. */
+     if (status != ZB_ZCL_STATUS_SUCCESS) {
+             LOG_ERR("Failed to update Minimum Block Period attribute");
+     }
+
+  #. In ``zboss/src/zcl/zcl_ota_upgrade_commands.c`` file in ``nrfxlib``, change penultimate argument of ``ZB_ZCL_OTA_UPGRADE_SEND_IMAGE_BLOCK_REQ()`` macro to ``delay`` in:
+
+     a. ``zb_zcl_ota_upgrade_send_block_requset()`` function
+     #. ``resend_buffer()`` function
+
+
 .. rst-class:: v1-8-0
 
 KRKNWK-12115: Simultaneous commissioning of many devices can cause the Coordinator device to assert
