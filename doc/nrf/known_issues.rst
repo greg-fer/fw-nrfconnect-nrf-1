@@ -743,7 +743,33 @@ KRKNWK-10611: DFU fails with external flash memory
   DFU will fail when using external flash memory for update image storage.
   For this reason, DFU with external flash memory cannot be performed on HomeKit accessories.
 
-More information on HomeKit known issues is available in the HomeKit documentation available in the sdk-homekit private repository.
+.. rst-class:: v1-6-0 v1-6-1 v1-7-0 v1-7-1 v1-8-0
+
+KRKNWK-9422: Thread on-mesh commissioning does not work.
+
+.. rst-class:: v1-6-0 v1-6-1
+
+Invalid NFC payload occurs if the accessory is paired.
+
+.. rst-class:: v1-6-1
+
+Build error when building with DEBUG_SETUP_CODE configuration
+  The following build error is observed with DEBUG_SETUP_CODE - invalid file path in CMakeFile.
+
+.. rst-class:: v1-6-1
+
+HomeKit accessory fails to start
+  Occasionally, the accessory fails to start after a factory reset attempt.
+
+.. rst-class:: v1-7-0 v1-7-1 v1-8-0
+
+KRKNWK-11666: The CLI command ``hap services`` returns incorrect results.
+  Observed issues with the command include float values not printed, values not updated, and read callbacks shown as "<No read callback>" even though present.
+
+.. rst-class:: v1-7-0 v1-7-1 v1-8-0
+
+KRKNWK-11365: The HAP tools ``provision`` command freezes
+  This issue happens on macOS when an EUI argument is not passed in attempt to read EUI from a connected board.
 
 nRF Desktop
 ===========
