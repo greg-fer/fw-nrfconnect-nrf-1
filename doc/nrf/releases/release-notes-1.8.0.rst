@@ -83,6 +83,18 @@ Gazell
 
 * Added support for nRF52 Series.
 
+HomeKit
+-------
+
+* Added production support for nRF5340 for Thread and Bluetooth LE HomeKit accessories.
+* Added production support for the nRF21540 front-end module combined with nRF53 Series SoCs.
+* Added development support for Weather Station application on Thingy:53 for HAP over Bluetooth LE.
+* Modified the structure of folders for examples and applications.
+* ADK version has been updated to ADK 6.1.
+* Fixed a stability issue in the Stateless Programmable Switch application.
+* Fixed memory access issues.
+* Fixed an issue with setting advertising interval.
+
 Applications
 ============
 
@@ -239,6 +251,12 @@ HomeKit samples
 * Added:
 
   * Samples are using Apple HomeKit ADK v6.1
+  * The role of buttons has been modified in all samples due to the ADK update:
+
+	* Button 1 - Clear pairing
+	* Button 2 - Factory reset
+	* Button 3 - Enter pairing mode
+	* Button 4 - Application action
 
 Matter samples
 --------------
