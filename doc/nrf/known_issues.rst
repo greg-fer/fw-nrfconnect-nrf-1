@@ -1374,6 +1374,14 @@ KRKNWK-6255: RSSI parameter adjustment is not applied
 
   **Workaround:** To apply RSSI parameter adjustments, cherry-pick the commits in `hal_nordic PR #88 <https://github.com/zephyrproject-rtos/hal_nordic/pull/88>`_, `sdk-nrfxlib PR #381 <https://github.com/nrfconnect/sdk-nrfxlib/pull/381>`_, and `sdk-zephyr PR #430 <https://github.com/nrfconnect/sdk-zephyr/pull/430>`_.
 
+.. rst-class:: v1-8-0 v1-7-1 v1-7-0
+
+KRKNWK-12261: Aborted transmission of 802.15.4 MAC encrypted frame can assert the board
+  If the transmission of the 802.15.4 MAC encrypted frame was aborted and the next transmitted frame is not to be encrypted, there is a possibility that the board shall assert.
+  The precondition for this is that the pointers to the transmitted frames are the same.
+
+  **Workaround:** If the transmission of the encrypted frame is failed, make sure the pointer to the next transmitted frame differs from the previous one.
+
 SoftDevice Controller
 =====================
 
