@@ -23,6 +23,12 @@ Clusters appropriate for a single device type such as a sensor or a light bulb a
 An application can implement appropriate callback functions to be informed about specific cluster state changes.
 These functions can be used to alter the device's behavior when the state of a cluster is changing as a result of some external event.
 
+.. raw:: html
+
+   <div style="text-align: center;">
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/sx3C5Zzz3XM" title="Creating Matter accessory device video tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </div>
+
 Read the following sections for detailed steps about how to expand the Matter template sample.
 
 Requirements
