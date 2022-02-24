@@ -1,5 +1,3 @@
-:orphan:
-
 .. _known_issues:
 
 Known issues
@@ -317,6 +315,13 @@ KRKNWK-6756: 802.15.4 Service Layer (SL) library support for the nRF53
 
 FOTA does not work
   FOTA with the :ref:`zephyr:smp_svr_sample` does not work.
+
+.. rst-class:: v1-9-0
+
+NCSDK-13925: Build warning in the RF test samples when the nRF21540 EK support is enabled.
+  :ref:`radio_test` and :ref:`direct_test_mode` build with warnings for nRF5340 with the :ref:`ug_radio_fem_nrf21540_ek` support.
+
+  **Workaround:** Change the parameter type in the :c:func:`nrf21540_tx_gain_set()` function in :file:`ncs/nrf/samples/bluetooth/direct_test_mode/src/fem/nrf21540.c` from :c:type:`uint8_t` to :c:type:`uint32_t`.
 
 nRF52820
 ========
@@ -919,6 +924,16 @@ NCSDK-12020: Current consumption for Gaming Mouse increased by 1400mA
   When not in the sleep mode, the Gaming Mouse reference design has current consumption higher by 1400mA.
 
   **Workaround:** Change ``pwm_pin_set_cycles`` to ``pwm_pin_set_usec`` in function :c:func:`led_pwm_set_brightness` in Zephyr's driver :file:`led_pwm.c` file.
+
+nRF Machine Learning
+====================
+
+.. rst-class:: v1-9-0
+
+NCSDK-13923: Device may crash during Bluetooth bonding
+  The device programmed with the nRF Machine Learning application may crash during Bluetooth bonding because of insufficient Bluetooth RX thread stack size.
+
+  **Workaround:** Manually cherry-pick and apply the commit with the fix from the ``main`` branch (commit hash: ``4870fcd8316bd3a4b53ca0054f0ce35e1a8c567d``).
 
 Pelion
 ======
@@ -1582,6 +1597,13 @@ SoftDevice Controller
 =====================
 
 In addition to the known issues listed here, see also :ref:`softdevice_controller_limitations` for permanent limitations.
+
+.. rst-class:: v1-9-1 v1-9-0 v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0
+
+DRGN-16859: The vendor-specific HCI command Zephyr Write TX Power Level may return "Unknown Advertiser Identifier (0x42)" when setting advertising output power.
+  The SoftDevice Controller will return this error code if the command is issued before advertising parameters are set.
+
+  **Workaround:** Configure the advertiser before setting TX Power using HCI LE Set Advertising Parameters
 
 .. rst-class:: v1-8-0 v1-7-1 v1-7-0 v1-6-1 v1-6-0 v1-5-2 v1-5-1 v1-5-0 v1-4-2 v1-4-1 v1-4-0 v1-3-2 v1-3-1 v1-3-0 v1-2-1 v1-2-0
 

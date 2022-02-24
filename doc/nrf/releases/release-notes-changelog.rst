@@ -1,5 +1,3 @@
-:orphan:
-
 .. _ncs_release_notes_changelog:
 
 Changelog for |NCS| v1.9.99
@@ -53,6 +51,13 @@ Matter
 
 |no_changes_yet_note|
 
+Thread
+------
+
+* Added:
+
+  *  Support for the Link Metrics and CSL Thread v1.2 features for the nRF53 Series devices.
+
 Applications
 ============
 
@@ -61,7 +66,16 @@ This section provides detailed lists of changes by :ref:`application <applicatio
 nRF9160: Asset Tracker v2
 -------------------------
 
-|no_changes_yet_note|
+* Updated:
+
+  * For nRF Cloud builds, the configuration section in the shadow is now initialized during the cloud connection process.
+
+nRF Desktop
+-----------
+
+* Added:
+
+  * Documentation for selective HID report subscription in :ref:`nrf_desktop_usb_state` using :kconfig:`CONFIG_DESKTOP_USB_SELECTIVE_REPORT_SUBSCRIPTION` option.
 
 Samples
 =======
@@ -72,7 +86,40 @@ For lists of protocol-specific changes, see `Protocols`_.
 Bluetooth samples
 -----------------
 
+* Updated:
+
+  * :ref:`direct_test_mode` sample:
+
+    * Fixed handling of the disable Constant Tone Extension command.
+    * The front-end module test parameters are not set to their default value after the DTM reset command.
+    * Added the vendor-specific ``FEM_DEFAULT_PARAMS_SET`` command for restoring the default front-end module parameters.
+
 |no_changes_yet_note|
+
+Bluetooth mesh samples
+----------------------
+
+* Updated
+
+  * All samples are using the Partition Manager, replacing the use of the Device Tree Source flash partitions.
+
+Thread samples
+--------------
+
+* Updated:
+
+  * The relevant sample documentation pages with information about support for :ref:`Trusted Firmware-M <ug_tfm>`.
+  * :ref:`ot_cli_sample` sample:
+
+    * Added :file:`prj_thread_1_2.conf` to support Thread v1.2 build for the nRF52 and nRF53 Series devices.
+    * Added child image configuration files for network core builds for Thread v1.2 build.
+
+nrf9160 Samples
+---------------
+
+* Added:
+
+  * Shell functionality to HTTP Update samples.
 
 Drivers
 =======
@@ -86,10 +133,35 @@ Libraries
 
 This section provides detailed lists of changes by :ref:`library <libraries>`.
 
+Libraries for networking
+------------------------
+
+* :ref:`lib_nrf_cloud_rest` library:
+
+   * Added JSON Web Token (JWT) autogeneration feature.
+
+     If enabled, the nRF Cloud REST library automatically generates a JWT if none is provided by the user when making REST requests.
+
+  * Updated:
+
+    * During the connection process, shadow data is sent to the application even if no "config" section is present.
+    * The application can now send shadow updates earlier in the connection process.
+
 Bluetooth libraries and services
 --------------------------------
 
-|no_changes_yet_note|
+* :ref:`gatt_dm_readme` library:
+
+  * Fixed discovery of empty services.
+
+Libraries for networking
+------------------------
+
+* :ref:`lib_download_client` library:
+
+  * Fixed
+
+    * An issue where downloads of COAP URIs would fail when they contained multiple path elements.
 
 sdk-nrfxlib
 -----------
@@ -109,20 +181,11 @@ Unity
 MCUboot
 =======
 
-The MCUboot fork in |NCS| (``sdk-mcuboot``) contains all commits from the upstream MCUboot repository up to and including ``680ed07``, plus some |NCS| specific additions.
+The MCUboot fork in |NCS| (``sdk-mcuboot``) contains all commits from the upstream MCUboot repository up to and including ``1eedec3e79``, plus some |NCS| specific additions.
 
 The code for integrating MCUboot into |NCS| is located in the :file:`ncs/nrf/modules/mcuboot` folder.
 
 The following list summarizes both the main changes inherited from upstream MCUboot and the main changes applied to the |NCS| specific additions:
-
-* |no_changes_yet_note|
-
-Mcumgr
-======
-
-The mcumgr library contains all commits from the upstream mcumgr repository up to and including snapshot ``657deb65``.
-
-The following list summarizes the most important changes inherited from upstream mcumgr:
 
 * |no_changes_yet_note|
 
@@ -131,21 +194,21 @@ Zephyr
 
 .. NOTE TO MAINTAINERS: All the Zephyr commits in the below git commands must be handled specially after each upmerge and each NCS release.
 
-The Zephyr fork in |NCS| (``sdk-zephyr``) contains all commits from the upstream Zephyr repository up to and including ``3f82656``, plus some |NCS| specific additions.
+The Zephyr fork in |NCS| (``sdk-zephyr``) contains all commits from the upstream Zephyr repository up to and including ``45ef0d2``, plus some |NCS| specific additions.
 
-For a complete list of upstream Zephyr commits incorporated into |NCS| since the most recent release, run the following command from the :file:`ncs/zephyr` repository (after running ``west update``):
-
-.. code-block:: none
-
-   git log --oneline 3f82656 ^v2.6.0-rc1-ncs1
-
-For a complete list of |NCS| specific commits, run:
+For the list of upstream Zephyr commits (not including cherry-picked commits) incorporated into nRF Connect SDK since the most recent release, run the following command from the :file:`ncs/zephyr` repository (after running ``west update``):
 
 .. code-block:: none
 
-   git log --oneline manifest-rev ^3f82656
+   git log --oneline 45ef0d2 ^zephyr-v2.7.0
 
-The current |NCS| main branch is based on the Zephyr v2.7 development branch.
+For the list of |NCS| specific commits, including commits cherry-picked from upstream, run:
+
+.. code-block:: none
+
+   git log --oneline manifest-rev ^45ef0d2
+
+The current |NCS| main branch is based on revision ``45ef0d2`` of Zephyr, which is located between v2.7.0 and v3.0.0 of Zephyr.
 
 Matter (Project CHIP)
 =====================
@@ -169,6 +232,13 @@ The change prompted some changes in the CMake for the module, notably:
 Documentation
 =============
 
-|no_changes_yet_note|
+* Added:
+
+  * Documentation for :ref:`degugging of nRF5340 <debugging>` in :ref:`working with nRF5340 DK<ug_nrf5340>` user guide.
+
+* Removed:
+
+  * Documentation on the Getting Started Assistant, as this tool is no longer in use.
+    Linux users can install the |NCS| by using the `Installing using Visual Studio Code <Installing on Linux_>`_ instructions or by following the steps on the :ref:`gs_installing` page.
 
 .. |no_changes_yet_note| replace:: No changes since the latest |NCS| release.
