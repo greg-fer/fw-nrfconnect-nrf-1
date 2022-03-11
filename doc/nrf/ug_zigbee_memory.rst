@@ -117,7 +117,7 @@ Values are provided in kilobytes (KB).
 
    .. tab:: nRF21540
 
-      The following table lists memory requirements for samples running on the :ref:`nR21540 DK <gs_programming_board_names>` (:ref:`nrf21540dk_nrf52840 <zephyr:nrf21540dk_nrf52840>`).
+      The following table lists memory requirements for samples running on the :ref:`nRF21540 DK <gs_programming_board_names>` (:ref:`nrf21540dk_nrf52840 <zephyr:nrf21540dk_nrf52840>`).
 
       +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
       | Sample                                                                                                                 | ROM, ZBOSS stack + App   | ROM, MCUboot bootloader   | ROM, ZBOSS non-volatile memory   | ROM, ZBOSS product config   | Total ROM   | RAM, ZBOSS stack + App   | Total RAM   |
