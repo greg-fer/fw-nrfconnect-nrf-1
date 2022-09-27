@@ -10,6 +10,9 @@ Glossary
 .. glossary::
    :sorted:
 
+   AA
+      Anti-aircraft gun.
+
    Access Port Protection (APPROTECT)
       A register used to prevent read and write access to all CPU registers and memory-mapped addresses.
 
