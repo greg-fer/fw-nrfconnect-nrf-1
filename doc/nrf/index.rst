@@ -3,6 +3,18 @@
 Welcome to the |NCS|!
 #####################
 
+.. important::
+
+   |NCS| v2.3.99-dev1 is a development tag and will be replaced by v2.4.0 in the future.
+
+   The development tag contains the following major updates:
+
+   * :ref:`ug_matter` protocol:
+
+     * Added support for the Matter specification v1.1.
+
+   For other changes that are included in this development tag, see :ref:`ncs_release_notes_changelog`.
+
 The |NCS| is where you begin building low-power wireless applications with Nordic Semiconductor nRF52, nRF53, nRF70, and nRF91 Series devices.
 
 The SDK contains optimized cellular IoT (LTE-M and NB-IoT), Bluetooth® Low Energy, Thread, Zigbee, Wi-Fi®, and Bluetooth mesh stacks, a range of applications, samples, and reference implementations, as well as a full suite of drivers for Nordic Semiconductor's devices.
@@ -32,7 +44,6 @@ A "99" at the end of the version number of this documentation indicates continuo
    libraries/index
    scripts
    release_notes
-   known_issues
    software_maturity
    documentation
    glossary

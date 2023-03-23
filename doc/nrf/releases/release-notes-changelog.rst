@@ -1,7 +1,7 @@
 .. _ncs_release_notes_changelog:
 
-Changelog for |NCS| v2.3.99
-###########################
+Changelog for |NCS| v2.3.99-dev1
+################################
 
 .. contents::
    :local:
@@ -153,25 +153,15 @@ This section provides detailed lists of changes by :ref:`application <applicatio
 nRF9160: Asset Tracker v2
 -------------------------
 
-* Updated:
-
-  * Use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud related string values.
-  * The application now integrates the :ref:`lib_lwm2m_client_utils` FOTA callback functionality.
+* Added the integration of the :ref:`lib_lwm2m_client_utils` FOTA callback functionality.
+* Updated use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud-related string values.
 
 nRF9160: Serial LTE modem
 -------------------------
 
-* Added:
-
-  * AT command ``#XWIFIPOS`` to get Wi-Fi location from nRF Cloud.
-
-* Updated:
-
-  * Use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud related string values.
-
-* Fixed:
-
-  * A bug in receiving large MQTT Publish message.
+* Added AT command ``#XWIFIPOS`` to get Wi-Fi location from nRF Cloud.
+* Updated use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud related string values.
+* Fixed a bug in receiving large MQTT Publish message.
 
 nRF5340 Audio
 -------------
@@ -189,7 +179,8 @@ nRF Machine Learning (Edge Impulse)
 nRF Desktop
 -----------
 
-* Added the :ref:`nrf_desktop_swift_pair_app`. The module is used to enable or disable the Swift Pair Bluetooth advertising payload depending on the selected Bluetooth peer (used local identity).
+* Added the :ref:`nrf_desktop_swift_pair_app`.
+  The module is used to enable or disable the Swift Pair Bluetooth advertising payload depending on the selected Bluetooth peer (used local identity).
 
 * Updated:
 
@@ -205,9 +196,7 @@ Samples
 Bluetooth samples
 -----------------
 
-* Removed:
-
-  * The Bluetooth 3-wire coex sample because of the removal of the 3-wire implementation.
+* Removed the Bluetooth 3-wire coex sample because of the removal of the 3-wire implementation.
 
 * :ref:`peripheral_hids_mouse` sample:
 
@@ -231,28 +220,20 @@ nRF9160 samples
 
 * :ref:`modem_shell_application` sample:
 
-  * Updated:
-
-    * Use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud related string values.
-      Remove the inclusion of the file :file:`nrf_cloud_codec.h`.
+  * Updated use defines from the :ref:`lib_nrf_cloud` library for nRF Cloud related string values.
+  * Removed the inclusion of the file :file:`nrf_cloud_codec.h`.
 
 * :ref:`slm_shell_sample` sample:
 
-  * Added:
-
-    * Support for the nRF7002 DK PCA10143.
+  * Added support for the nRF7002 DK PCA10143.
 
 * :ref:`lwm2m_client` sample:
 
-  * Updated:
-
-    * The sample now integrates the :ref:`lib_lwm2m_client_utils` FOTA callback functionality.
+  * Updated the sample to integrate the :ref:`lib_lwm2m_client_utils` FOTA callback functionality.
 
 * :ref:`nrf_cloud_mqtt_multi_service` sample:
 
-  * Updated:
-
-    * Increased the MCUboot partition size to the minimum necessary to allow bootloader FOTA.
+  * Updated the sample by increasing the MCUboot partition size to the minimum necessary to allow bootloader FOTA.
 
 * :ref:`nrf_cloud_rest_device_message` sample:
 
@@ -359,10 +340,8 @@ Modem libraries
 
 * :ref:`nrf_modem_lib_readme` library:
 
-  * Added:
-
-    * The function :c:func:`nrf_modem_lib_fault_strerror` to retrieve a statically allocated textual description of a given modem fault.
-      The function can be enabled using the new Kconfig option :kconfig:option:`CONFIG_NRF_MODEM_LIB_FAULT_STRERROR`.
+  * Added the function :c:func:`nrf_modem_lib_fault_strerror` to retrieve a statically allocated textual description of a given modem fault.
+    The function can be enabled using the new Kconfig option :kconfig:option:`CONFIG_NRF_MODEM_LIB_FAULT_STRERROR`.
 
   * Updated:
 
@@ -397,13 +376,8 @@ Libraries for networking
 
 * :ref:`lib_lwm2m_client_utils` library:
 
-  * Updated:
-
-    * :file:`lwm2m_client_utils.h` includes new API for FOTA to register application callback to receive state changes and requests for the update process.
-
-  * Removed:
-
-    * The old API ``lwm2m_firmware_get_update_state_cb()``.
+  * Updated :file:`lwm2m_client_utils.h` to include new API for FOTA to register application callback to receive state changes and requests for the update process.
+  * Removed the old API ``lwm2m_firmware_get_update_state_cb()``.
 
 Libraries for NFC
 -----------------
