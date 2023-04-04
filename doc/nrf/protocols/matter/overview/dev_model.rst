@@ -36,13 +36,21 @@ Supported Matter versions in the |NCS|
 
 The following table lists Matter versions supported in the |NCS|, with a brief overview of changes and the release date.
 
-+-----------------+----------------------------------------------+---------------------+
-| Matter version  | Overview of changes                          | Release date        |
-+=================+==============================================+=====================+
-| 1.1.0           |                                              |                     |
-+-----------------+----------------------------------------------+---------------------+
-| 1.0.0           | Initial version of the Matter specification. | November 2, 2022    |
-+-----------------+----------------------------------------------+---------------------+
+.. list-table:: Matter version overview
+   :header-rows: 1
+
+   * - Matter version
+     - Release date
+     - Overview of changes
+   * - 1.1.0
+     - April 20, 2023
+     - | * Support for persistent subscriptions.
+       | * Certification tests for verifying the usage of multiple credentials types at the same time (such as pin codes, RFID, or fingerprint) for a Door Lock device type. (The cluster implementation was present in the Matter 1.0.0, but it was not verified.)
+       | * Significant editorial changes and clarifications in the Matter specification and Matter Test Plan.
+       | * Improved alignment of the Matter specification with the Matter SDK.
+   * - 1.0.0
+     - November 2, 2022
+     - Initial version of the Matter specification.
 
 .. _ug_matter_overview_dev_model_ecosystems:
 
