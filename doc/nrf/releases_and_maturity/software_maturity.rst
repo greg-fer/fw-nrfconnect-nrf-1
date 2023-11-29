@@ -114,8 +114,8 @@ The following table indicates the software maturity levels of the support for th
         - Description
         - Limitations
         - Maturity level
-      * - **Broadcast source**
-        - Transmitting broadcast audio using Broadcast Isochronous Stream (BIS) and Broadcast Isochronous Group (BIG).
+      * - :ref:`**Broadcast source** <nrf53_audio_broadcast_source_app>`
+        - Broadcasting audio using Broadcast Isochronous Stream (BIS) and Broadcast Isochronous Group (BIG).
 
           Play and pause emulated by disabling and enabling stream, respectively.
         - The following limitations apply:
@@ -125,7 +125,7 @@ The following table indicates the software maturity levels of the support for th
           * Configuration: 16 bit, several bit rates ranging from 32 kbps to 124 kbps.
 
         - Experimental
-      * - **Broadcast sink**
+      * - :ref:`**Broadcast sink** <nrf53_audio_broadcast_sink_app>`
         - Receiving broadcast audio using BIS and BIG.
 
           Synchronizes and unsynchronizes with the stream.
@@ -136,7 +136,7 @@ The following table indicates the software maturity levels of the support for th
           * Configuration: 16 bit, several bit rates ranging from 32 kbps to 124 kbps.
 
         - Experimental
-      * - **Unicast client**
+      * - :ref:`**Unicast client** <nrf53_audio_unicast_client_app>`
         - One Connected Isochronous Group (CIG) with two Connected Isochronous Streams (CIS).
 
           Transmitting unidirectional or transceiving bidirectional audio using CIG and CIS.
@@ -148,8 +148,8 @@ The following table indicates the software maturity levels of the support for th
           * Configuration: 16 bit, several bit rates ranging from 32 kbps to 124 kbps.
 
         - Experimental
-      * - **Unicast server**
-        - One CIG with two CIS streams.
+      * - :ref:`**Unicast server** <nrf53_audio_unicast_server_app>`
+        - One CIG with one CIS stream.
 
           Receiving unidirectional or transceiving bidirectional audio using CIG and CIS.
 
