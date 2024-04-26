@@ -7,8 +7,15 @@ Features of nRF91 Series
    :local:
    :depth: 2
 
-The nRF91 Series SiPs integrate an application MCU, a full LTE modem, an RF front end, and power management.
-With built-in GNSS support, it is a great choice for asset tracking applications.
+The nRF91 Series SiPs integrate an application MCU, a full LTE modem, an RF front end, and power management:
+
+* The nRF9160 DK is a hardware development platform used to design and develop application firmware on the nRF9160 LTE Cat-M1 and Cat-NB1 :term:`System in Package (SiP)`.
+* The nRF9161 DK is a hardware development platform used to design and develop application firmware on the nRF9161 :term:`System in Package (SiP)`.
+  The nRF9161 SiP is a low power SiP with integrated DECT NR+ modem and 3GPP Release 14 LTE-M/NB-IoT with GNSS.
+* Nordic Thingy:91 is a battery-operated prototyping platform for cellular IoT systems, designed especially for asset tracking applications and environmental monitoring.
+  Thingy:91 integrates an nRF9160 SiP that supports LTE-M, NB-IoT, and Global Navigation Satellite System (GNSS) and an nRF52840 SoC that supports Bluetooth® Low Energy, Near Field Communication (NFC) and USB.
+
+With built-in GNSS support, these devices are a great choice for asset tracking applications.
 
 The following figure illustrates the conceptual layout when targeting an nRF91 Series Cortex-M33 application MCU with TrustZone:
 
