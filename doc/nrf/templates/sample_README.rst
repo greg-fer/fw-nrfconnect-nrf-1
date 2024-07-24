@@ -103,11 +103,27 @@ LED 2:
    Indicates something.
 
 
-Configuration*
-**************
+Configuration and building
+**************************
 
 .. note::
-   Always include this section if your sample can be configured by the user.
+   * Configuring a sample for a specific use case always requires rebuilding it.
+     For this reason and to mirror the structure of :ref:`configure_application`, configuration and building instructions are combined.
+   * At the start, always include the standard text for building - either ``.. include:: /includes/build_and_run.txt`` or ``.. include:: /includes/build_and_run_ns.txt`` for the board targets that use :ref:`Cortex-M Security Extensions <app_boards_spe_nspe>`.
+     "Standard" refers here to building the sample in its default form, before any additional configuration takes place.
+     If the standard procedure is very different from the basic steps for :ref:`building`, explain why it is so in the Overview section or directly under the building instructions.
+   * If the sample uses a non-standard setup, describe it in a subsection and link to more information, if possible.
+     You can include the non-standard building instructions in these subsections.
+   * The main supported IDE for |NCS| is |VSC|, with the |nRFVSC| installed.
+     Therefore, build instructions for the |nRFVSC| are required.
+     Build instructions for the command line are optional.
+   * See the link to the `nRF Connect for Visual Studio Code`_ documentation site for basic instructions on building with the extension.
+
+.. |sample path| replace:: :file:`samples/XXX`
+
+.. include:: /includes/build_and_run.txt
+
+.. note::
    Start with the stock phrase that is included with ``|config|``.
 
 |config|
@@ -173,35 +189,19 @@ The following files are available:
 * :file:`filename.conf` - Specific scenario.
   This configuration file ...
 
-Building and running
-********************
+Some configuration title*
+=========================
 
 .. note::
-   * Include the standard text for building - either ``.. include:: /includes/build_and_run.txt`` or ``.. include:: /includes/build_and_run_ns.txt`` for the board targets that use :ref:`Cortex-M Security Extensions <app_boards_spe_nspe>`.
-   * The main supported IDE for |NCS| is |VSC|, with the |nRFVSC| installed.
-     Therefore, build instructions for the |nRFVSC| are required.
-     Build instructions for the command line are optional.
-   * See the link to the `nRF Connect for Visual Studio Code`_ documentation site for basic instructions on building with the extension.
-   * If the sample uses a non-standard setup, point it out and link to more information, if possible.
-
-.. |sample path| replace:: :file:`samples/XXX`
-
-.. include:: /includes/build_and_run.txt
-
-Note that this sample enables the :ref:`XXX <nrfxlib:nrfxlib>` stack.
-See REF for more information.
-
-Some title*
-===========
-
-.. note::
-   If required, add subsections for additional build instructions.
+   If required, add subsections for additional configuration and building instructions.
    Use these subsections sparingly and only if the content does not fit into other sections (mainly Configuration).
    If the additional build instructions are valid for other samples as well, consider adding them to the :ref:`configuration_and_build` section instead and linking to them.
 
 
-Testing
-=======
+Programming and testing
+***********************
+
+|program_and_test|
 
 |test_sample|
 

@@ -4,11 +4,19 @@
 .. |release_tt| replace:: ``v2.7.0``
 .. |release_number_tt| replace:: ``2.7.0``
 
-.. ### Config shortcuts
+.. ### Config and build shortcuts
 
 .. |how_to_configure| replace:: See :ref:`configure_application` for information on how to set the required configuration options temporarily or permanently.
 
 .. |config| replace:: See :ref:`configure_application` for information about how to permanently or temporarily change the configuration.
+
+.. |build_for_cmse| replace:: When built as firmware image for a board target with the ``*/ns`` :ref:`variant <app_boards_names>`, the sample has Cortex-M Security Extensions (CMSE) enabled and separates the firmware between Non-Secure Processing Environment (NSPE) and Secure Processing Environment (SPE).
+   Because of this, it automatically includes the :ref:`Trusted Firmware-M (TF-M) <ug_tfm>`.
+   To read more about CMSE, see :ref:`app_boards_spe_nspe`.
+
+.. ### Programming and testing shortcuts
+
+.. |program_and_test| replace:: See :ref:`programming` for general programming steps and :ref:`testing` for general information about testing and debugging in the |NCS|.
 
 .. |test_sample| replace:: After programming the sample to your development kit, complete the following steps to test it:
 
