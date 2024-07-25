@@ -78,23 +78,28 @@ User interface
       LED 2:
          Lit when the development kit is connected as peripheral.
 
-Building and running
-********************
+
+Configuration and building
+**************************
 .. |sample path| replace:: :file:`samples/bluetooth/central_and_peripheral_hr`
 
-.. include:: /includes/build_and_run_ns.txt
+.. include:: /includes/configure_and_build.txt
 
-.. include:: /includes/nRF54H20_erase_UICR.txt
+|build_for_cmse|
 
 .. _central_and_peripheral_hrs_testing:
 
-Testing
-=======
+Programming and testing
+***********************
+
+|program_and_test|
+
+.. include:: /includes/nRF54H20_erase_UICR.txt
 
 After programming the sample to your development kit, test it either by connecting to other development kits that are running the :ref:`zephyr:peripheral_hr` sample, or by using the Bluetooth Low Energy app from the `nRF Connect for Desktop`_, which emulates an HRS server.
 
 Testing with other development kits
------------------------------------
+===================================
 
 .. tabs::
 
@@ -159,7 +164,7 @@ Testing with other development kits
       The sample works now as relay for the Heart Rate Service.
 
 Testing with nRF Connect for Desktop
-------------------------------------
+====================================
 
 .. tabs::
 
