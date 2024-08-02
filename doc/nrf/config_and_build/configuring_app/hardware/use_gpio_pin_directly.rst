@@ -7,21 +7,33 @@ Driving a GPIO pin directly
    :local:
    :depth: 2
 
-This user guide shows how to drive a GPIO pin directly.
-In the development phase of an embedded project, it can be used to collect execution timings or as a debugging tool.
+This user guide shows how to define, configure, and implement a GPIO pin directly using a binding for Nordic Semiconductor devices.
+In the development phase of an embedded project, you can use this configuration to collect execution timings, or as a debugging tool.
 
-Declaring the GPIO pin
+You can apply this configuration manually in the devicetree overlay files or using the `Devicetree Visual Editor <How to work with Devicetree Visual Editor_>`_ (either in GUI or text mode) in the |nRFVSC|.
+
+.. rst-class:: numbered-step
+
+Define the DTS binding
 **********************
 
-To declare a GPIO pin node, use a DTS node with ``nordic,gpio-pins`` compatible set in the :term:`devicetree <Devicetree>`.
-If your application does not use the same GPIO instance as used by the node, enable the GPIO port instance required by the GPIO driver.
+You need to define the new GPIO pin node for the pin to be recognized by DTS.
 
-This DTS content can be introduced in the DTS of your board, application, or overlay file.
+If you work with a Nordic Semiconductor device, you can use the binding definition in :file:`dts/bindings/gpio`.
+
+See Zephyr's documentation about :ref:`dt-bindings` for more information.
+
+.. rst-class:: numbered-step
+
+Configure the GPIO pin through DTS
+**********************************
+
+To declare a GPIO pin node, create a DTS node in the DTS of your board, application, or overlay file.
 Pins defined this way can be accessed using devicetree macros.
 
-The following snippet shows the declaration of a GPIO pin node for **Pin 2** of **GPIO0**.
-The node is labeled as ``user-dbg-pin``.
-Additionally, the ``gpio0`` instance and ``gpiote0`` are enabled, so the GPIO driver can be built and executed.
+If your application does not use the same GPIO instance as used by the node, enable the GPIO port instance required by the GPIO driver.
+
+The following snippet shows the declaration of a GPIO pin node:
 
 .. code-block:: c
 
@@ -41,8 +53,18 @@ Additionally, the ``gpio0`` instance and ``gpiote0`` are enabled, so the GPIO dr
 		status = "okay";
 	};
 
-Using the pin in your application
-*********************************
+In this snippet:
+
+* The node is labelled as ``user-dbg-pin``.
+* ``compatible`` specifies the binding definition to be used (``nordic,gpio-pins`` from :file:`dts/bindings/gpio`).
+* ``gpios`` specifies which pin node is being used (**Pin 2** of **GPIO0**).
+* ``status`` enables the pin node when it is set to ``"okay"``.
+* Additionally, the ``gpio0`` instance and ``gpiote0`` are enabled, so the GPIO driver can be built and executed.
+
+.. rst-class:: numbered-step
+
+Include the pin in your application
+***********************************
 
 To let your application access the declared pins, use the following devicetree macros:
 
@@ -62,7 +84,7 @@ To let your application access the declared pins, use the following devicetree m
           gpio_pin_configure_dt(&pin_dbg, GPIO_OUTPUT_INACTIVE);
     }
 
-#. To let your application drive the pin, add the following code where needed:
+#. Add the following code where needed to let your application drive the pin:
 
    .. code-block:: c
 
@@ -83,7 +105,8 @@ This is an easy way to disable this debugging infrastructure.
 Declaring multiple pins
 ***********************
 
-Multiple pins can be declared in one GPIO property as well.
+You can also declare multiple pins in one GPIO property.
+See the following code snippet:
 
 .. code-block:: c
 
@@ -96,8 +119,7 @@ Multiple pins can be declared in one GPIO property as well.
 		};
 	};
 
-To initialize the defined GPIO pin structures, use the ``GPIO_DT_SPEC_INST_GET_BY_IDX_OR()`` macro.
-
+To initialize the defined GPIO pin structures, use the ``GPIO_DT_SPEC_INST_GET_BY_IDX_OR()`` macro:
 
 .. code-block:: c
 
