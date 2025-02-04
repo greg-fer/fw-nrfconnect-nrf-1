@@ -136,7 +136,7 @@ Configuring basic configuration
 |config|
 
 Building basic configuration
-===========================
+============================
 
 .. |sample path| replace:: :file:`samples/bluetooth/peripheral_lbs`
 
