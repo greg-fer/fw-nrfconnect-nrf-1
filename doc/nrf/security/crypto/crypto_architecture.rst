@@ -56,7 +56,9 @@ Implementations in the |NCS|
 
 The |NCS| follows the PSA Crypto standard through two major API implementations: Oberon PSA Crypto and TF-M Crypto Service.
 They are designed for use without and with Trusted Firmware-M (TF-M), respectively, and have different security requirements.
-Both are based on the `sdk-oberon-psa-crypto`_ library, which offers a lightweight PSA Crypto API implementation optimized for resource-constrained microcontrollers.
+Both implementations are based on the `sdk-oberon-psa-crypto`_ library, which offers a lightweight PSA Crypto API implementation optimized for resource-constrained microcontrollers.
+
+Additionally, the |NCS| includes the nRF54H20-specific IronSide Secure Element implementation.
 
 .. figure:: ../images/psa_crypto_api_overview.svg
    :alt: PSA Crypto API implementations in the |NCS|
@@ -153,3 +155,10 @@ When using the TF-M Crypto Service implementation, keys from the PSA Crypto API 
 * Protected Storage (PS) - One of :ref:`ug_tfm_architecture_rot_services_application` that provides secure storage within the Trusted Firmware-M environment.
 
 For more information about the storage integration for the TF-M Crypto Service implementation, see :ref:`ug_psa_certified_api_overview_secstorage` and :ref:`ug_tfm_services`.
+
+.. _ug_crypto_architecture_implementation_standards_ironside:
+
+IronSide Secure Element implementation
+======================================
+
+
