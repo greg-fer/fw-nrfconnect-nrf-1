@@ -198,6 +198,10 @@ int sw_codec_encode(struct net_buf *audio_frame)
 int sw_codec_decode(struct net_buf const *const audio_frame, void **decoded_data,
 		    size_t *decoded_size)
 {
+	if (decoded_data == NULL || decoded_size == NULL) {
+		return -EINVAL;
+	}
+
 	*decoded_size = 0;
 
 	if (!m_config.decoder.enabled) {
@@ -234,12 +238,6 @@ int sw_codec_decode(struct net_buf const *const audio_frame, void **decoded_data
 		} else {
 			LOG_ERR("Unsupported location for sw_codec_decode: 0x%x", meta->locations);
 			return -ENODEV;
-		}
-
-		if (m_config.decoder.channel_mode > CONFIG_AUDIO_DECODE_CHANNELS_MAX) {
-			LOG_WRN("Channel mode %d is not supported by decoder",
-				m_config.decoder.channel_mode);
-			ERR_CHK(-ENODEV);
 		}
 
 		switch (m_config.decoder.channel_mode) {

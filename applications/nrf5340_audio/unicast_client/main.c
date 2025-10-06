@@ -423,6 +423,7 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 
 	case BT_MGMT_SECURITY_CHANGED:
 		LOG_INF("Security changed");
+
 		ret = srv_store_lock(SRV_STORE_LOCK_WAIT_TIME_MS);
 		ERR_CHK_MSG(ret, "Failed to lock server store");
 
@@ -432,6 +433,7 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 			 */
 
 			LOG_DBG("Server already in store, addr resolved");
+
 			ret = srv_store_conn_update(msg->conn, &msg->addr);
 			if (ret) {
 				LOG_ERR("Failed to update conn in store: %d", ret);
@@ -446,6 +448,7 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 		}
 
 		break;
+
 	case BT_MGMT_PAIRING_COMPLETE:
 		LOG_INF("Pairing complete event");
 
@@ -461,6 +464,7 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 
 		srv_store_unlock();
 		discovery_process_start(msg->conn);
+
 		break;
 
 	case BT_MGMT_DISCONNECTED:
@@ -476,18 +480,24 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 		if (ret) {
 			LOG_DBG("Failed to clear conn from store: %d", ret);
 		}
+
 		srv_store_unlock();
+
 		break;
+
 	case BT_MGMT_BOND_DELETED:
 		LOG_DBG("Bond deleted");
+
 		ret = srv_store_remove_by_addr(&msg->addr);
 		if (ret) {
 			LOG_ERR("Failed to remove server from store: %d", ret);
 		}
+
 		break;
 
 	default:
 		LOG_WRN("Unexpected/unhandled bt_mgmt event: %d", msg->event);
+
 		break;
 	}
 }
@@ -507,6 +517,7 @@ static int zbus_subscribers_create(void)
 		&button_msg_sub_thread_data, button_msg_sub_thread_stack,
 		CONFIG_BUTTON_MSG_SUB_STACK_SIZE, (k_thread_entry_t)button_msg_sub_thread, NULL,
 		NULL, NULL, K_PRIO_PREEMPT(CONFIG_BUTTON_MSG_SUB_THREAD_PRIO), 0, K_NO_WAIT);
+
 	ret = k_thread_name_set(button_msg_sub_thread_id, "Msg_sub_btn");
 	if (ret) {
 		LOG_ERR("Failed to create button_msg thread");
@@ -517,6 +528,7 @@ static int zbus_subscribers_create(void)
 		&le_audio_msg_sub_thread_data, le_audio_msg_sub_thread_stack,
 		CONFIG_LE_AUDIO_MSG_SUB_STACK_SIZE, (k_thread_entry_t)le_audio_msg_sub_thread, NULL,
 		NULL, NULL, K_PRIO_PREEMPT(CONFIG_LE_AUDIO_MSG_SUB_THREAD_PRIO), 0, K_NO_WAIT);
+
 	ret = k_thread_name_set(le_audio_msg_sub_thread_id, "Msg_sub_LE_Audio");
 	if (ret) {
 		LOG_ERR("Failed to create le_audio_msg thread");
@@ -528,6 +540,7 @@ static int zbus_subscribers_create(void)
 		CONFIG_CONTENT_CONTROL_MSG_SUB_STACK_SIZE,
 		(k_thread_entry_t)content_control_msg_sub_thread, NULL, NULL, NULL,
 		K_PRIO_PREEMPT(CONFIG_CONTENT_CONTROL_MSG_SUB_THREAD_PRIO), 0, K_NO_WAIT);
+
 	ret = k_thread_name_set(content_control_thread_id, "Msg_sub_content_ctrl");
 	if (ret) {
 		return ret;
@@ -618,6 +631,7 @@ static void fill_server_store_by_bonded(const struct bt_bond_info *info, void *u
 
 	ret = srv_store_add_by_addr(&info->addr);
 	ERR_CHK_MSG(ret, "Failed to add server store");
+
 	srv_store_unlock();
 }
 
