@@ -625,11 +625,19 @@ ZTEST(suite_server_store, test_pres_delay_multi_group)
 		      "Retrieved server connection does not match expected");
 
 	TEST_CAP_STREAM(TCS_1_existing, BT_AUDIO_DIR_SINK, 2000, 0xAAAA);
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_min = 1000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_min = 2000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_max = 4000;
 
 	memcpy(&retr_server->snk.cap_streams[0], &TCS_1_existing, sizeof(TCS_1_existing));
 
-	/* Add stream in another group. Should be ignored */
+	/* Add stream in another group.*/
 	TEST_CAP_STREAM(TCS_2_existing, BT_AUDIO_DIR_SINK, 500, 0xBBBB);
+	TCS_2_existing.bap_stream.ep->qos_pref.pd_min = 500;
+	TCS_2_existing.bap_stream.ep->qos_pref.pref_pd_min = 500;
+	TCS_2_existing.bap_stream.ep->qos_pref.pref_pd_max = 500;
+	TCS_2_existing.bap_stream.ep->qos_pref.pd_max = 500;
 
 	memcpy(&retr_server->snk.cap_streams[1], &TCS_2_existing, sizeof(TCS_2_existing));
 
@@ -655,14 +663,18 @@ ZTEST(suite_server_store, test_pres_delay_multi_group)
 		      computed_pres_dly_us);
 	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
 
-	/* New stream in group BBBB, But other dir. No change  */
-	TEST_CAP_STREAM(TCS_2_new, BT_AUDIO_DIR_SOURCE, 0, 0xBBBB);
+	/* New stream in group BBBB, No change  */
+	TEST_CAP_STREAM(TCS_2_new, BT_AUDIO_DIR_SINK, 1000, 0xBBBB);
+	server_qos_pref.pd_min = 500;
+	server_qos_pref.pref_pd_min = 2000;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 4000;
 
 	ret = srv_store_pres_dly_find(&TCS_2_new.bap_stream, &computed_pres_dly_us,
 				      &existing_pres_dly_us, &server_qos_pref,
 				      &group_reconfig_needed);
 	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
-	zassert_equal(computed_pres_dly_us, 2100, "Presentation delay should be QoS pref min %d",
+	zassert_equal(computed_pres_dly_us, 500, "Presentation delay should be QoS pref min %d",
 		      computed_pres_dly_us);
 	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
 

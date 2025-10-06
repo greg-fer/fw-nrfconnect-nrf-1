@@ -100,14 +100,10 @@ static bool pres_dly_in_range(uint32_t existing_pres_dly_us,
 	}
 
 	if (existing_pres_dly_us > server_qos_pref->pd_max) {
-		LOG_DBG("Existing presentation delay %u is greater than max %u",
-			existing_pres_dly_us, server_qos_pref->pd_max);
 		return false;
 	}
 
 	if (existing_pres_dly_us < server_qos_pref->pd_min) {
-		LOG_DBG("Existing presentation delay %u is less than min %u", existing_pres_dly_us,
-			server_qos_pref->pd_min);
 		return false;
 	}
 	/* We will not check the preferred presentation delay if we already have a running stream in
@@ -370,38 +366,75 @@ static bool pac_record_print(struct bt_data *data, void *user_data)
 	return true;
 }
 
+static void stream_print(struct bt_bap_qos_cfg_pref const *const qos, bool evaluated,
+			 const char *usr_string)
+{
+	char buf[10] = {0};
+
+	if (evaluated) {
+		strcpy(buf, "(Eval)");
+	} else {
+		strcpy(buf, "(N/A) ");
+	}
+
+	LOG_INF("%s%s\t abs min: %05u pref min: %05u pref max: %05u  abs max: "
+		"%05u ",
+		usr_string, buf, qos->pd_min, qos->pref_pd_min, qos->pref_pd_max, qos->pd_max);
+}
+
+static void done_print(uint8_t existing_streams_checked,
+		       struct bt_bap_qos_cfg_pref const *const common_qos,
+		       uint32_t computed_pres_dly_us, uint32_t existing_pres_dly_us)
+{
+	char buf[20] = {0};
+
+	if (computed_pres_dly_us != UINT32_MAX) {
+		sprintf(buf, "%u", computed_pres_dly_us);
+	} else {
+		strcpy(buf, "No common value");
+	}
+
+	LOG_INF("Outcome \t\t abs min: %05u pref min: %05u pref max: %05u  abs max: %05u\n"
+		"\t selected: %s us, existing: %u us, 1 incoming + %d existing stream(s) "
+		"compared.",
+		common_qos->pd_min, common_qos->pref_pd_min, common_qos->pref_pd_max,
+		common_qos->pd_max, buf, existing_pres_dly_us, existing_streams_checked);
+}
+
 /* Check to see if the existing stream can be ignored when we try to find a valid presentation delay
  * when a new stream is added.
  */
-static bool pres_dly_ignore_stream(struct bt_bap_stream const *const existing_stream,
-				   struct bt_bap_stream const *const stream_in)
+static bool pres_dly_compare_stream(struct bt_bap_stream const *const existing_stream,
+				    struct bt_bap_stream const *const stream_in)
 {
 	if (existing_stream == NULL || stream_in == NULL) {
 		LOG_ERR("NULL parameter");
-		return true;
+		return false;
 	}
 
 	if (existing_stream->group == NULL) {
-		return true;
-	}
-
-	if (existing_stream->group != stream_in->group) {
-		/* The existing stream is not in the same group as the incoming stream */
-		return true;
+		return false;
 	}
 
 	if (existing_stream == stream_in) {
 		/* The existing stream is the same as the incoming stream */
-		return true;
+		LOG_ERR("Existing stream is the same as incoming stream");
+		return false;
 	}
 
 	if (existing_stream->ep == NULL) {
-		return true;
+		return false;
+	}
+
+	if (existing_stream->group != stream_in->group) {
+		/* The existing stream is not in the same group as the incoming stream */
+		stream_print(&existing_stream->ep->qos_pref, false, "Existing");
+		return false;
 	}
 
 	/* TODO: Add check if we are in QOS configured or higher state */
-
-	return false;
+	stream_print(&existing_stream->ep->qos_pref, true, "Existing");
+	return true;
 }
 
 /* Get a server based on the address in a conn pointer */
@@ -549,25 +582,6 @@ bool srv_store_preset_validated(struct bt_audio_codec_cfg *new, struct bt_audio_
 	return false;
 }
 
-void done_print(uint8_t existing_streams_checked, struct bt_bap_qos_cfg_pref common_qos,
-		uint32_t computed_pres_dly_us)
-{
-	char buf[20] = {0};
-
-	if (computed_pres_dly_us != UINT32_MAX) {
-		sprintf(buf, "%u", computed_pres_dly_us);
-	} else {
-		strcpy(buf, "No common value");
-	}
-
-	LOG_INF("1 incoming + %d existing stream(s) checked. The pres delay extremes are: "
-		"\n  abs min: %u\n pref min: %u\n pref max: %u\n  abs max: %u\n "
-		"selected: "
-		"%s",
-		existing_streams_checked, common_qos.pd_min, common_qos.pref_pd_min,
-		common_qos.pref_pd_max, common_qos.pd_max, buf);
-}
-
 /* Find the presentation delay. Needs to be the same within a CIG for a given direction */
 int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pres_dly_us,
 			    uint32_t *existing_pres_dly_us,
@@ -604,6 +618,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 	*group_reconfig_needed = false;
 	*computed_pres_dly_us = UINT32_MAX;
 
+	stream_print(server_qos_pref, true, "Incoming");
+
 	/* Common QoS with most permissive values */
 	struct bt_bap_qos_cfg_pref common_qos = {
 		.pd_min = 0,
@@ -636,11 +652,6 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 			continue;
 		}
 
-		if (server->conn == stream->conn) {
-			/* Do not compare against the same unicast server */
-			continue;
-		}
-
 		uint8_t ase_count = 0;
 
 		if (ep_info.dir == BT_AUDIO_DIR_SINK) {
@@ -663,7 +674,7 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 			}
 
 			/* Check if the existing stream we compare against can be ignored */
-			if (pres_dly_ignore_stream(existing_bap_stream, stream)) {
+			if (!pres_dly_compare_stream(existing_bap_stream, stream)) {
 				continue;
 			}
 
@@ -690,8 +701,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 
 			if (pres_dly_in_range(*existing_pres_dly_us, server_qos_pref)) {
 				*computed_pres_dly_us = *existing_pres_dly_us;
-				done_print(existing_streams_checked, common_qos,
-					   *computed_pres_dly_us);
+				done_print(existing_streams_checked, &common_qos,
+					   *computed_pres_dly_us, *existing_pres_dly_us);
 				LOG_INF("The existing pres delay is within the incoming stream QoS "
 					"range");
 				return 0;
@@ -702,8 +713,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 			ret = pres_delay_compute(&common_qos, &existing_bap_stream->ep->qos_pref);
 			if (ret) {
 				*computed_pres_dly_us = UINT32_MAX;
-				done_print(existing_streams_checked, common_qos,
-					   *computed_pres_dly_us);
+				done_print(existing_streams_checked, &common_qos,
+					   *computed_pres_dly_us, *existing_pres_dly_us);
 				return ret;
 			}
 		}
@@ -714,7 +725,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 			LOG_ERR("No common ground for pd_min %u and pd_max %u", common_qos.pd_min,
 				common_qos.pd_max);
 			*computed_pres_dly_us = UINT32_MAX;
-			done_print(existing_streams_checked, common_qos, *computed_pres_dly_us);
+			done_print(existing_streams_checked, &common_qos, *computed_pres_dly_us,
+				   *existing_pres_dly_us);
 			return -ESPIPE;
 		}
 
@@ -735,7 +747,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 			}
 		}
 
-		done_print(existing_streams_checked, common_qos, *computed_pres_dly_us);
+		done_print(existing_streams_checked, &common_qos, *computed_pres_dly_us,
+			   *existing_pres_dly_us);
 		return 0;
 	}
 
@@ -747,7 +760,8 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
 		*computed_pres_dly_us = common_qos.pref_pd_min;
 	}
 
-	done_print(existing_streams_checked, common_qos, *computed_pres_dly_us);
+	done_print(existing_streams_checked, &common_qos, *computed_pres_dly_us,
+		   *existing_pres_dly_us);
 	return 0;
 }
 
