@@ -249,6 +249,7 @@ nRF5340 Audio
   * The API documentation in the header files listed on the :ref:`audio_api` page.
 
 * Updated:
+
   * The unicast client (gateway) has been rewritten to support N channels.
   * The unicast client (gateway) now checks if a server has a resolvable address.
     If this has not been resolved, the discovery process will start in the identity resolved callback.

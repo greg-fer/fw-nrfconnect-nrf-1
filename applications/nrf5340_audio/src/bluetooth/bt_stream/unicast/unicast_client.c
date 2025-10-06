@@ -46,6 +46,8 @@ K_MSGQ_DEFINE(cap_proc_q, sizeof(enum cap_procedure_type), CONFIG_BT_ISO_MAX_CHA
 
 /* For unicast (as opposed to broadcast) level 2/subgroup is not defined in the specification */
 #define LVL2 0
+/* Will return 1 if x == 0, due to how locations are defined in LE Audio */
+#define POPCOUNT_ZERO(x) ((x) == 0 ? 1 : POPCOUNT(x))
 
 struct discover_dir {
 	struct bt_conn *conn;
@@ -117,7 +119,7 @@ static void cap_proc_waiting_check(void)
 		unicast_client_start(0);
 		break;
 	case CAP_PROCEDURE_UPDATE:
-		LOG_WRN("Update procedure not implemented");
+		LOG_ERR("Update procedure not implemented");
 		break;
 	case CAP_PROCEDURE_STOP:
 		unicast_client_stop(0);
@@ -162,7 +164,7 @@ static bool unicast_group_populate(struct server_store *server, void *user_data)
 	}
 
 	/* Add only the streams that has a valid preset set */
-	for (int j = 0; j < MIN(server->snk.num_eps, POPCOUNT(server->snk.locations)); j++) {
+	for (int j = 0; j < MIN(server->snk.num_eps, POPCOUNT_ZERO(server->snk.locations)); j++) {
 		if (server->snk.lc3_preset[j].qos.pd == 0) {
 			LOG_DBG("Sink EP %d has no valid preset, skipping", j);
 			return true;
@@ -175,7 +177,7 @@ static bool unicast_group_populate(struct server_store *server, void *user_data)
 	}
 
 	/* Add only the streams that has a valid preset set */
-	for (int j = 0; j < MIN(server->src.num_eps, POPCOUNT(server->src.locations)); j++) {
+	for (int j = 0; j < MIN(server->src.num_eps, POPCOUNT_ZERO(server->src.locations)); j++) {
 		if (server->src.lc3_preset[j].qos.pd == 0) {
 			LOG_DBG("Source EP %d has no valid preset, skipping", j);
 			return true;
@@ -206,15 +208,6 @@ static void unicast_group_create(void)
 		return;
 	}
 
-	/* Find out how many servers we have connected */
-	uint8_t num_servers = srv_store_num_get(true);
-
-	if (num_servers == 0) {
-		LOG_ERR("No servers found, cannot create unicast group");
-		srv_store_unlock();
-		return;
-	}
-
 	/* Find out how many valid sink EPs we have */
 	struct num_eps_total num_eps = {0, 0};
 
@@ -224,10 +217,6 @@ static void unicast_group_create(void)
 		srv_store_unlock();
 		return;
 	}
-
-	LOG_INF("We have %d servers, with a total of %d valid sink EPs and %d "
-		"valid source EPs",
-		num_servers, num_eps.sink, num_eps.source);
 
 	if (num_eps.sink == 0 && num_eps.source == 0) {
 		LOG_ERR("No valid sink or source EPs found, cannot create unicast "
@@ -409,7 +398,7 @@ static bool server_stream_in_unicast_group_check(struct server_store *server, vo
 	/* Check each of the streams in the unicast_group against all of the
 	 * streams in the server
 	 */
-	for (int i = 0; i < MIN(server->snk.num_eps, POPCOUNT(server->snk.locations)); i++) {
+	for (int i = 0; i < MIN(server->snk.num_eps, POPCOUNT_ZERO(server->snk.locations)); i++) {
 		ret = bt_cap_unicast_group_foreach_stream(unicast_group, stream_in_group_check,
 							  &server->snk.cap_streams[i]);
 		if (ret == 0) {
@@ -677,39 +666,42 @@ static void endpoint_cb(struct bt_conn *conn, enum bt_audio_dir dir, struct bt_b
 		return;
 	}
 
-	if (dir == BT_AUDIO_DIR_SINK) {
-		if (ep != NULL) {
-			if (server->snk.num_eps >= ARRAY_SIZE(server->snk.eps)) {
-				LOG_WRN("No more space (%d) for sink endpoints, increase "
-					"CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SNK_COUNT (%d)",
-					server->snk.num_eps, ARRAY_SIZE(server->snk.eps));
-				srv_store_unlock();
-				return;
-			}
-
-			server->snk.eps[server->snk.num_eps] = ep;
-			server->snk.num_eps++;
-		}
-
-		if (server->snk.eps[0] == NULL) {
+	if (ep != NULL) {
+		if (dir == BT_AUDIO_DIR_SINK && server->snk.eps[0] == NULL) {
 			LOG_WRN("No sink endpoints found");
 		}
-	} else if (dir == BT_AUDIO_DIR_SOURCE) {
-		if (ep != NULL) {
-			if (server->src.num_eps >= ARRAY_SIZE(server->src.eps)) {
-				LOG_WRN("No more space for source endpoints, increase "
-					"CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SRC_COUNT");
-				srv_store_unlock();
-				return;
-			}
 
-			server->src.eps[server->src.num_eps] = ep;
-			server->src.num_eps++;
-		}
-
-		if (server->src.eps[0] == NULL) {
+		if (dir == BT_AUDIO_DIR_SOURCE && server->src.eps[0] == NULL) {
 			LOG_WRN("No source endpoints found");
 		}
+
+		srv_store_unlock();
+		return;
+	}
+
+	if (dir == BT_AUDIO_DIR_SINK) {
+		if (server->snk.num_eps >= ARRAY_SIZE(server->snk.eps)) {
+			LOG_WRN("No more space (%d) for sink endpoints, increase "
+				"CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SNK_COUNT (%d)",
+				server->snk.num_eps, ARRAY_SIZE(server->snk.eps));
+			srv_store_unlock();
+			return;
+		}
+
+		server->snk.eps[server->snk.num_eps] = ep;
+		server->snk.num_eps++;
+
+	} else if (dir == BT_AUDIO_DIR_SOURCE) {
+		if (server->src.num_eps >= ARRAY_SIZE(server->src.eps)) {
+			LOG_WRN("No more space for source endpoints, increase "
+				"CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SRC_COUNT");
+			srv_store_unlock();
+			return;
+		}
+
+		server->src.eps[server->src.num_eps] = ep;
+		server->src.num_eps++;
+
 	} else {
 		LOG_WRN("Endpoint direction not recognized: %d", dir);
 	}
@@ -761,7 +753,7 @@ static void discover_cb_sink(struct bt_conn *conn, int err, struct server_store 
 	/* Get the valid configuration to set for this stream and put that in the corresponding
 	 * preset
 	 */
-	if (POPCOUNT(server->snk.locations) == 1 && server->snk.num_eps >= 1) {
+	if (POPCOUNT_ZERO(server->snk.locations) == 1 && server->snk.num_eps >= 1) {
 		ret = bt_audio_codec_cfg_set_val(
 			&server->snk.lc3_preset[0].codec_cfg, BT_AUDIO_CODEC_CFG_CHAN_ALLOC,
 			(uint8_t *)&server->snk.locations, sizeof(server->snk.locations));
@@ -770,7 +762,7 @@ static void discover_cb_sink(struct bt_conn *conn, int err, struct server_store 
 			return;
 		}
 
-	} else if (POPCOUNT(server->snk.locations) == 2 && server->snk.num_eps >= 2 &&
+	} else if (POPCOUNT_ZERO(server->snk.locations) == 2 && server->snk.num_eps >= 2 &&
 		   (server->snk.locations &
 		    (BT_AUDIO_LOCATION_FRONT_LEFT | BT_AUDIO_LOCATION_FRONT_RIGHT)) ==
 			   (BT_AUDIO_LOCATION_FRONT_LEFT | BT_AUDIO_LOCATION_FRONT_RIGHT)) {
@@ -801,7 +793,7 @@ static void discover_cb_sink(struct bt_conn *conn, int err, struct server_store 
 	} else {
 		LOG_WRN("Unsupported unicast server/headset configuration");
 		LOG_WRN("Number of sink channels: %d, number of sink endpoints: %d",
-			POPCOUNT(server->snk.locations), server->snk.num_eps);
+			POPCOUNT_ZERO(server->snk.locations), server->snk.num_eps);
 		le_audio_event_publish(LE_AUDIO_EVT_NO_VALID_CFG, conn, NULL, BT_AUDIO_DIR_SINK);
 		return;
 	}
@@ -958,13 +950,15 @@ static void stream_configured_cb(struct bt_bap_stream *stream,
 	}
 
 	dir = le_audio_stream_dir_get(stream);
-	if ((dir != BT_AUDIO_DIR_SINK && dir != BT_AUDIO_DIR_SOURCE) || (dir <= 0)) {
-		if (dir <= 0) {
-			LOG_ERR("Failed to get dir of stream %p", (void *)stream);
-		} else {
-			LOG_ERR("Endpoint direction not recognized: %d", dir);
-		}
+	if (dir <= 0) {
+		LOG_ERR("Failed to get dir of stream %p", (void *)stream);
+		srv_store_unlock();
+		return;
+	}
 
+	/* Sanity check */
+	if ((dir != BT_AUDIO_DIR_SINK && dir != BT_AUDIO_DIR_SOURCE)) {
+		LOG_ERR("Endpoint direction not recognized: %d", dir);
 		srv_store_unlock();
 		return;
 	}
@@ -1411,8 +1405,8 @@ static bool add_to_start_params(struct server_store *server, void *user_data)
 	int ret;
 	struct bt_cap_unicast_audio_start_param *param = user_data;
 
-	for (int j = 0; j < MIN(server->snk.num_eps, POPCOUNT(server->snk.locations)); j++) {
-		uint8_t state = BT_BAP_EP_STATE_IDLE;
+	for (int j = 0; j < MIN(server->snk.num_eps, POPCOUNT_ZERO(server->snk.locations)); j++) {
+		uint8_t state;
 
 		ret = le_audio_ep_state_get(server->snk.eps[j], &state);
 		if (state == BT_BAP_EP_STATE_STREAMING || ret) {
@@ -1428,8 +1422,8 @@ static bool add_to_start_params(struct server_store *server, void *user_data)
 	}
 
 	/* Check if we have valid source endpoints to start */
-	for (int j = 0; j < MIN(server->src.num_eps, POPCOUNT(server->src.locations)); j++) {
-		uint8_t state = BT_BAP_EP_STATE_IDLE;
+	for (int j = 0; j < MIN(server->src.num_eps, POPCOUNT_ZERO(server->src.locations)); j++) {
+		uint8_t state;
 
 		ret = le_audio_ep_state_get(server->src.eps[j], &state);
 		if (state == BT_BAP_EP_STATE_STREAMING || ret) {
@@ -1618,7 +1612,6 @@ static bool unicast_send_info_populate(struct server_store *server, void *user_d
 
 		ret = bt_audio_codec_cfg_get_val(server->snk.cap_streams[i].bap_stream.codec_cfg,
 						 BT_AUDIO_CODEC_CFG_CHAN_ALLOC, &loc);
-
 		if (ret < 0) {
 			LOG_ERR("Failed to get channel allocation: %d", ret);
 			return false;
@@ -1626,7 +1619,6 @@ static bool unicast_send_info_populate(struct server_store *server, void *user_d
 
 		/* Set channel location */
 		/* Both mono and left unicast_servers will receive left channel */
-
 		info->tx[info->num_active_streams].audio_channel =
 			*loc == BT_AUDIO_LOCATION_FRONT_RIGHT ? AUDIO_CH_R : AUDIO_CH_L;
 

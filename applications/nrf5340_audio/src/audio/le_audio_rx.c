@@ -133,7 +133,7 @@ void le_audio_rx_data_handler(struct net_buf *audio_frame_rx, struct audio_metad
 			/* We have a new frame with a different timestamp, so we will send the
 			 * old frame and create a new one
 			 */
-			LOG_DBG("Received audio frame with different timestamp, sending old frame, "
+			LOG_WRN("Received audio frame with different timestamp, sending old frame, "
 				"old ts: %u, new ts: %u",
 				existing_meta->ref_ts_us, meta->ref_ts_us);
 

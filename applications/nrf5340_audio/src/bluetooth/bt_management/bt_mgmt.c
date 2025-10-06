@@ -168,9 +168,7 @@ static void disconnected_cb(struct bt_conn *conn, uint8_t reason)
 #if defined(CONFIG_BT_SMP)
 static void security_changed_cb(struct bt_conn *conn, bt_security_t level, enum bt_security_err err)
 {
-	/* The address has not yet been resolved at this point if this is the first time they bond.
-	 * After this the controller may resolve the address.
-	 */
+	/* The address may not be resolved at this point */
 	int ret;
 	struct bt_mgmt_msg msg;
 

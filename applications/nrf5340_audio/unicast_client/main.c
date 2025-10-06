@@ -422,7 +422,7 @@ static void bt_mgmt_evt_handler(const struct zbus_channel *chan)
 		break;
 
 	case BT_MGMT_SECURITY_CHANGED:
-		LOG_INF("Security changed. Addr is resolved");
+		LOG_INF("Security changed");
 		ret = srv_store_lock(SRV_STORE_LOCK_WAIT_TIME_MS);
 		ERR_CHK_MSG(ret, "Failed to lock server store");
 

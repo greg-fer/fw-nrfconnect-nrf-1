@@ -684,7 +684,9 @@ int unicast_server_enable(le_audio_receive_cb recv_cb, enum bt_audio_location lo
 	if (unicast_server_params.snk_cnt == 0) {
 		LOG_ERR("No sink endpoint requested");
 		return -EINVAL;
-	} else if (unicast_server_params.snk_cnt > CONFIG_BT_ASCS_MAX_ASE_SNK_COUNT) {
+	}
+
+	if (unicast_server_params.snk_cnt > CONFIG_BT_ASCS_MAX_ASE_SNK_COUNT) {
 		LOG_WRN("Too many sink endpoints requested (%d), max %d, will just use first "
 			"location",
 			unicast_server_params.snk_cnt, CONFIG_BT_ASCS_MAX_ASE_SNK_COUNT);
