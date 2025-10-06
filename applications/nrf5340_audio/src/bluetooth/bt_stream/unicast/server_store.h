@@ -103,8 +103,13 @@ bool srv_store_preset_validated(struct bt_audio_codec_cfg *new, struct bt_audio_
  * the given direction. This function will try to satisfy the preferred presentation delay for all
  * ASEs. If that is not possible, it will try to satisfy the max and min values.
  *
- * @param common_pres_dly_us Pointer to store the new common presentation delay in microseconds.
- * @param dir	The direction of the Audio Stream Endpoints (ASEs) to search for.
+ * @param[in] stream Pointer to a new stream to be started
+ * @param[out] computed_pres_dly_us Pointer to store the computed presentation delay in
+ * microseconds.
+ * @param[out] existing_pres_dly_us Pointer to store the existing presentation delay in
+ * microseconds.
+ * @param[in] server_qos_pref Pointer to the preferred QoS configuration.
+ * @param[out] group_reconfig_needed True if a group reconfiguration is needed.
  *
  * @note	This function will search across CIGs. This may not make sense, as the same
  * presentation delay is only mandated within a CIG. srv_store_lock() must be called before
@@ -116,7 +121,7 @@ bool srv_store_preset_validated(struct bt_audio_codec_cfg *new, struct bt_audio_
  */
 int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pres_dly_us,
 			    uint32_t *existing_pres_dly_us,
-			    struct bt_bap_qos_cfg_pref const *qos_cfg_pref_in,
+			    struct bt_bap_qos_cfg_pref const *server_qos_pref,
 			    bool *group_reconfig_needed);
 
 /**

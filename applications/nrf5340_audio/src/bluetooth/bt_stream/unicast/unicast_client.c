@@ -928,7 +928,7 @@ static bool new_pres_dly_us_set(struct bt_cap_stream *stream, void *user_data)
 }
 
 static void stream_configured_cb(struct bt_bap_stream *stream,
-				 const struct bt_bap_qos_cfg_pref *pref)
+				 const struct bt_bap_qos_cfg_pref *server_pref)
 {
 	int ret;
 	enum bt_audio_dir dir;
@@ -973,7 +973,7 @@ static void stream_configured_cb(struct bt_bap_stream *stream,
 	bool group_reconfigure_needed = false;
 	uint32_t existing_pres_dly_us = 0;
 
-	ret = srv_store_pres_dly_find(stream, &new_pres_dly_us, &existing_pres_dly_us, pref,
+	ret = srv_store_pres_dly_find(stream, &new_pres_dly_us, &existing_pres_dly_us, server_pref,
 				      &group_reconfigure_needed);
 	if (ret) {
 		LOG_ERR("Cannot get a valid presentation delay");

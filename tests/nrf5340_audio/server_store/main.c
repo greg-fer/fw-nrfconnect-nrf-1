@@ -17,17 +17,17 @@
 #include <../subsys/bluetooth/host/conn_internal.h>
 #include "server_store.h"
 
-#define TEST_CAP_STREAM(val)                                                                       \
-	struct bt_cap_stream test_##val##_cap_stream;                                              \
-	struct bt_bap_ep test_##val##_ep_var = {0};                                                \
-	struct bt_iso_chan test_##val##_bap_iso = {0};                                             \
-	struct bt_bap_qos_cfg test_##val##_qos = {0};                                              \
-	test_##val##_qos.pd = val;                                                                 \
-	test_##val##_ep_var.dir = 1;                                                               \
-	test_##val##_cap_stream.bap_stream.ep = &test_##val##_ep_var;                              \
-	test_##val##_cap_stream.bap_stream.iso = &test_##val##_bap_iso;                            \
-	test_##val##_cap_stream.bap_stream.group = (void *)0;                                      \
-	test_##val##_cap_stream.bap_stream.qos = &test_##val##_qos;
+#define TEST_CAP_STREAM(name, dir_in, pd_in, group_in)                                             \
+	struct bt_cap_stream name = {0};                                                           \
+	struct bt_bap_ep name##_ep_var = {0};                                                      \
+	struct bt_iso_chan name##_bap_iso = {0};                                                   \
+	struct bt_bap_qos_cfg name##_qos = {0};                                                    \
+	name##_qos.pd = pd_in;                                                                     \
+	name##_ep_var.dir = dir_in;                                                                \
+	name.bap_stream.ep = &name##_ep_var;                                                       \
+	name.bap_stream.iso = &name##_bap_iso;                                                     \
+	name.bap_stream.group = (void *)group_in;                                                  \
+	name.bap_stream.qos = &name##_qos;
 
 #define TEST_CONN(val)                                                                             \
 	struct bt_conn test_##val##_conn = {                                                       \
@@ -140,39 +140,45 @@ ZTEST(suite_server_store, test_srv_store_pointer_check)
 	TEST_CONN(2);
 	TEST_CONN(3);
 
-	struct server_store *retr_server1 = NULL;
-	struct server_store *retr_server2 = NULL;
-	struct server_store *retr_server3 = NULL;
+	struct server_store *retr_server1A = NULL;
+	struct server_store *retr_server1B = NULL;
+	struct server_store *retr_server2A = NULL;
+	struct server_store *retr_server2B = NULL;
+	struct server_store *retr_server3A = NULL;
+	struct server_store *retr_server3B = NULL;
 
 	ret = srv_store_lock(K_NO_WAIT);
 	zassert_equal(ret, 0);
 
 	ret = srv_store_add_by_conn(&test_2_conn);
 	zassert_equal(ret, 0);
-	ret = srv_store_from_conn_get(&test_2_conn, &retr_server2);
+	ret = srv_store_from_conn_get(&test_2_conn, &retr_server2A);
 	zassert_equal(ret, 0);
-	retr_server2->snk.num_codec_caps = 2;
+	retr_server2A->snk.num_codec_caps = 2;
 
 	ret = srv_store_add_by_conn(&test_1_conn);
 	zassert_equal(ret, 0);
-	ret = srv_store_from_conn_get(&test_2_conn, &retr_server2);
+	ret = srv_store_from_conn_get(&test_2_conn, &retr_server2B);
 	zassert_equal(ret, 0);
+	zassert_equal(retr_server2A, retr_server2B, "Pointers to do not match");
+	zassert_equal(retr_server2B->snk.num_codec_caps, 2,
+		      "Server 2 codec cap count does not match expected");
 
-	ret = srv_store_from_conn_get(&test_1_conn, &retr_server1);
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server1A);
 	zassert_equal(ret, 0);
-	retr_server1->snk.num_codec_caps = 1;
 
 	ret = srv_store_add_by_conn(&test_3_conn);
 	zassert_equal(ret, 0);
-	ret = srv_store_from_conn_get(&test_3_conn, &retr_server3);
-	zassert_equal(ret, 0);
-	retr_server3->snk.num_codec_caps = 3;
-
-	ret = srv_store_from_conn_get(&test_1_conn, &retr_server1);
+	ret = srv_store_from_conn_get(&test_3_conn, &retr_server3A);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_from_conn_get(&test_3_conn, &retr_server3);
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server1B);
 	zassert_equal(ret, 0);
+	zassert_equal(retr_server1A, retr_server1B, "Pointers to do not match");
+
+	ret = srv_store_from_conn_get(&test_3_conn, &retr_server3B);
+	zassert_equal(ret, 0);
+	zassert_equal(retr_server3A, retr_server3B, "Pointers to do not match");
 
 	srv_store_unlock();
 }
@@ -211,7 +217,7 @@ ZTEST(suite_server_store, test_srv_remove)
 
 	/* Test with creating a gap in server store. */
 	ret = srv_store_num_get(true);
-	zassert_equal(ret, -EINVAL, "Number of servers should be two after removing one");
+	zassert_equal(ret, -EINVAL, "Should return -EINVAL when there is a gap in store");
 
 	ret = srv_store_num_get(false);
 	zassert_equal(ret, 1, "Number of servers should be two after removing one");
@@ -241,31 +247,29 @@ ZTEST(suite_server_store, test_find_srv_from_stream)
 	zassert_equal(ret, 0);
 
 	retr_server->name = "Test Server 1";
-	TEST_CAP_STREAM(1);
-	memcpy(&retr_server->snk.cap_streams[0], &test_1_cap_stream, sizeof(test_1_cap_stream));
-	TEST_CAP_STREAM(2);
-	memcpy(&retr_server->snk.cap_streams[1], &test_2_cap_stream, sizeof(test_2_cap_stream));
-	TEST_CAP_STREAM(3);
-	memcpy(&retr_server->snk.cap_streams[2], &test_3_cap_stream, sizeof(test_3_cap_stream));
+	TEST_CAP_STREAM(TCS_1_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[0], &TCS_1_existing, sizeof(TCS_1_existing));
+	TEST_CAP_STREAM(TCS_2_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[1], &TCS_2_existing, sizeof(TCS_2_existing));
+	TEST_CAP_STREAM(TCS_3_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[2], &TCS_3_existing, sizeof(TCS_3_existing));
 
 	ret = srv_store_from_conn_get(&test_2_conn, &retr_server);
 	zassert_equal(ret, 0);
 
 	retr_server->name = "Test Server 2";
-	TEST_CAP_STREAM(4);
-	memcpy(&retr_server->snk.cap_streams[0], &test_4_cap_stream, sizeof(test_4_cap_stream));
-	TEST_CAP_STREAM(5);
-	memcpy(&retr_server->snk.cap_streams[1], &test_5_cap_stream, sizeof(test_5_cap_stream));
-	TEST_CAP_STREAM(6);
-	memcpy(&retr_server->snk.cap_streams[2], &test_6_cap_stream, sizeof(test_6_cap_stream));
+	TEST_CAP_STREAM(TCS_4_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[0], &TCS_4_existing, sizeof(TCS_4_existing));
+	TEST_CAP_STREAM(TCS_5_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[1], &TCS_5_existing, sizeof(TCS_5_existing));
+	TEST_CAP_STREAM(TCS_6_existing, BT_AUDIO_DIR_SINK, 40000, 0x1111);
+	memcpy(&retr_server->snk.cap_streams[2], &TCS_6_existing, sizeof(TCS_6_existing));
 
 	struct bt_bap_stream *stream_pointer = &retr_server->snk.cap_streams[1].bap_stream;
 
 	ret = srv_store_from_stream_get((struct bt_bap_stream *)0xDEADBEEF, &retr_server);
 	zassert_equal(ret, -ENOENT, "Retrieving from non existing stream should return -ENOENT");
 	zassert_is_null(retr_server, "Retrieved server should be NULL");
-
-	TC_PRINT("test bap ptr %p\n", stream_pointer);
 
 	struct server_store *found_server = NULL;
 
@@ -283,15 +287,14 @@ ZTEST(suite_server_store, test_pres_dly_simple)
 {
 	int ret;
 
-	TEST_CAP_STREAM(1);
-	test_1_cap_stream.bap_stream.group = (void *)0xaaaa;
+	TEST_CAP_STREAM(TCS_1_new, BT_AUDIO_DIR_SINK, 40000, 0x1111);
 
-	struct bt_bap_qos_cfg_pref qos_cfg_pref_in;
+	struct bt_bap_qos_cfg_pref server_qos_pref;
 
-	qos_cfg_pref_in.pd_min = 1000;
-	qos_cfg_pref_in.pd_max = 4000;
-	qos_cfg_pref_in.pref_pd_min = 2000;
-	qos_cfg_pref_in.pref_pd_max = 3000;
+	server_qos_pref.pd_min = 1000;
+	server_qos_pref.pref_pd_min = 2000;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 4000;
 
 	/* For this test, we have no other endpoints or streams stored
 	 * This simulates getting the first call to find the presentation delay
@@ -304,8 +307,8 @@ ZTEST(suite_server_store, test_pres_dly_simple)
 	ret = srv_store_lock(K_NO_WAIT);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
 				      &group_reconfig_needed);
 
 	zassert_equal(ret, 0);
@@ -313,111 +316,36 @@ ZTEST(suite_server_store, test_pres_dly_simple)
 		      "Computed presentation delay should be equal to preferred min");
 
 	/* Removing preferred min. Result should return min */
-	qos_cfg_pref_in.pref_pd_min = 0;
+	server_qos_pref.pref_pd_min = 0;
 
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
 				      &group_reconfig_needed);
 	zassert_equal(ret, 0);
 	zassert_equal(computed_pres_dly_us, 1000,
 		      "Computed presentation delay should be equal to preferred min");
+	zassert_equal(existing_pres_dly_us, 0,
+		      "Computed presentation delay should be equal to preferred min");
 
 	/* Removing min, should return error*/
-	qos_cfg_pref_in.pd_min = 0;
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
+	server_qos_pref.pd_min = 0;
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
 				      &group_reconfig_needed);
 	zassert_equal(ret, -EINVAL, "Finding presentation delay should return -EINVAL %d ", ret);
+	zassert_equal(existing_pres_dly_us, 0,
+		      "Computed presentation delay should be equal to preferred min");
 
-	/*TODO: Add test for existing_pres_dly_us*/
 	srv_store_unlock();
 }
 
-ZTEST(suite_server_store, test_pres_delay_advanced)
+ZTEST(suite_server_store, test_pres_dly_not_found)
 {
 	int ret;
 
-	TEST_CONN(100);
-
-	ret = srv_store_lock(K_NO_WAIT);
-	zassert_equal(ret, 0);
-
-	ret = srv_store_add_by_conn(&test_100_conn);
-	zassert_equal(ret, 0);
-
-	struct server_store *retr_server = NULL;
-
-	ret = srv_store_from_conn_get(&test_100_conn, &retr_server);
-	zassert_equal(ret, 0);
-	zassert_not_null(retr_server, "Retrieved server should not be NULL");
-	zassert_equal(retr_server->conn, &test_100_conn,
-		      "Retrieved server connection does not match expected");
-
-	TEST_CAP_STREAM(1);
-	test_1_cap_stream.bap_stream.ep->qos_pref.pd_min = 1000;
-	test_1_cap_stream.bap_stream.ep->qos_pref.pd_max = 4000;
-	test_1_cap_stream.bap_stream.ep->qos_pref.pref_pd_min = 2000;
-	test_1_cap_stream.bap_stream.ep->qos_pref.pref_pd_max = 3000;
-	test_1_cap_stream.bap_stream.group = (void *)0xaaaa;
-	test_1_cap_stream.bap_stream.qos->pd = 2500;
-
-	memcpy(&retr_server->snk.cap_streams[0], &test_1_cap_stream, sizeof(test_1_cap_stream));
-
-	TEST_CAP_STREAM(2);
-
-	struct bt_bap_qos_cfg_pref qos_cfg_pref_in;
-
-	qos_cfg_pref_in.pd_min = 1100;
-	qos_cfg_pref_in.pd_max = 4000;
-	qos_cfg_pref_in.pref_pd_min = 2100;
-	qos_cfg_pref_in.pref_pd_max = 3000;
-
-	uint32_t computed_pres_dly_us = 0;
-	uint32_t existing_pres_dly_us = 0;
-	bool group_reconfig_needed = false;
-
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
-				      &group_reconfig_needed);
-	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
-	zassert_equal(computed_pres_dly_us, 2500, "Presentation delay should be unchanged %d",
-		      computed_pres_dly_us);
-	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
-
-	/* Testing with pref outside existing PD. Should not change existing streams*/
-
-	qos_cfg_pref_in.pref_pd_min = 2600;
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
-				      &group_reconfig_needed);
-	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
-	zassert_equal(computed_pres_dly_us, 2500, "Presentation delay should be unchanged %d",
-		      computed_pres_dly_us);
-	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
-
-	/* Now check with min outside range. Shall trigger a reconfig*/
-	qos_cfg_pref_in.pd_min = 2600;
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
-				      &group_reconfig_needed);
-	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
-	zassert_equal(computed_pres_dly_us, 2600, "Presentation delay should be unchanged %d",
-		      computed_pres_dly_us);
-	zassert_equal(group_reconfig_needed, true, "Group reconfiguration should not be needed");
-	srv_store_unlock();
-}
-
-ZTEST(suite_server_store, test_pres_delay_multi_group)
-{
-	int ret;
-
-	TEST_CONN(100);
 	TEST_CONN(1);
 
 	ret = srv_store_lock(K_NO_WAIT);
-	zassert_equal(ret, 0);
-
-	ret = srv_store_add_by_conn(&test_100_conn);
 	zassert_equal(ret, 0);
 
 	ret = srv_store_add_by_conn(&test_1_conn);
@@ -425,43 +353,319 @@ ZTEST(suite_server_store, test_pres_delay_multi_group)
 
 	struct server_store *retr_server = NULL;
 
-	ret = srv_store_from_conn_get(&test_100_conn, &retr_server);
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server);
 	zassert_equal(ret, 0);
 	zassert_not_null(retr_server, "Retrieved server should not be NULL");
-	zassert_equal(retr_server->conn, &test_100_conn,
+	zassert_equal(retr_server->conn, &test_1_conn,
 		      "Retrieved server connection does not match expected");
 
-	TEST_CAP_STREAM(1);
-	test_1_cap_stream.bap_stream.group = (void *)0xaaaa;
-	test_1_cap_stream.bap_stream.qos->pd = 2000;
+	TEST_CAP_STREAM(TCS_1_new, BT_AUDIO_DIR_SINK, 1100, 0xAAAA);
+	TCS_1_new.bap_stream.ep->qos_pref.pd_min = 1000;
+	TCS_1_new.bap_stream.ep->qos_pref.pref_pd_min = 2000;
+	TCS_1_new.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_1_new.bap_stream.ep->qos_pref.pd_max = 4000;
 
-	memcpy(&retr_server->snk.cap_streams[0], &test_1_cap_stream, sizeof(test_1_cap_stream));
-
-	/* Add stream in another group. Should be ignored */
-	TEST_CAP_STREAM(2);
-	test_2_cap_stream.bap_stream.group = (void *)0xbbbb;
-	test_2_cap_stream.bap_stream.qos->pd = 500;
-
-	memcpy(&retr_server->snk.cap_streams[1], &test_2_cap_stream, sizeof(test_2_cap_stream));
-
-	struct bt_bap_qos_cfg_pref qos_cfg_pref_in;
-
-	qos_cfg_pref_in.pd_min = 1100;
-	qos_cfg_pref_in.pd_max = 4000;
-	qos_cfg_pref_in.pref_pd_min = 2100;
-	qos_cfg_pref_in.pref_pd_max = 3000;
+	memcpy(&retr_server->snk.cap_streams[0], &TCS_1_new, sizeof(TCS_1_new));
 
 	uint32_t computed_pres_dly_us = 0;
 	uint32_t existing_pres_dly_us = 0;
 	bool group_reconfig_needed = false;
 
-	ret = srv_store_pres_dly_find(&test_1_cap_stream.bap_stream, &computed_pres_dly_us,
-				      &existing_pres_dly_us, &qos_cfg_pref_in,
+	struct bt_bap_qos_cfg_pref server_qos_pref;
+
+	/*  Min outside existing group range */
+	server_qos_pref.pd_min = 4001;
+	server_qos_pref.pref_pd_min = 4002;
+	server_qos_pref.pref_pd_max = 4003;
+	server_qos_pref.pd_max = 4004;
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+
+	zassert_equal(ret, -ESPIPE);
+
+	/* Max outside existing group range */
+	server_qos_pref.pd_min = 996;
+	server_qos_pref.pref_pd_min = 997;
+	server_qos_pref.pref_pd_max = 998;
+	server_qos_pref.pd_max = 999;
+
+	zassert_equal(ret, -ESPIPE);
+
+	srv_store_unlock();
+}
+
+ZTEST(suite_server_store, test_pres_delay_advanced)
+{
+	int ret;
+
+	TEST_CONN(1);
+
+	ret = srv_store_lock(K_NO_WAIT);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_add_by_conn(&test_1_conn);
+	zassert_equal(ret, 0);
+
+	struct server_store *retr_server = NULL;
+
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server);
+	zassert_equal(ret, 0);
+	zassert_not_null(retr_server, "Retrieved server should not be NULL");
+	zassert_equal(retr_server->conn, &test_1_conn,
+		      "Retrieved server connection does not match expected");
+
+	TEST_CAP_STREAM(TCS_1_existing, BT_AUDIO_DIR_SINK, 2500, 0xAAAA);
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_min = 1001;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_min = 2000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_max = 4000;
+
+	memcpy(&retr_server->snk.cap_streams[0], &TCS_1_existing, sizeof(TCS_1_existing));
+
+	TEST_CAP_STREAM(TCS_1_new, BT_AUDIO_DIR_SINK, 0, 0xAAAA);
+
+	struct bt_bap_qos_cfg_pref server_qos_pref;
+
+	server_qos_pref.pd_min = 1100;
+	server_qos_pref.pref_pd_min = 2100;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 4000;
+
+	uint32_t computed_pres_dly_us = 0;
+	uint32_t existing_pres_dly_us = 0;
+	bool group_reconfig_needed = false;
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
+	zassert_equal(computed_pres_dly_us, 2500, "Presentation delay should be unchanged %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 2500);
+	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
+
+	/* Testing with pref outside existing PD. Should not change existing streams*/
+
+	server_qos_pref.pref_pd_min = 2600;
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
+	zassert_equal(computed_pres_dly_us, 2500, "Presentation delay should be unchanged %d",
+		      computed_pres_dly_us);
+	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
+
+	/* Now check with min outside range. Shall trigger a reconfig*/
+	server_qos_pref.pd_min = 2600;
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
+	zassert_equal(computed_pres_dly_us, 2600, "Presentation delay should be unchanged %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 2500);
+	zassert_equal(group_reconfig_needed, true, "Group reconfiguration should not be needed");
+
+	srv_store_unlock();
+}
+
+ZTEST(suite_server_store, test_pres_delay_multiple_streams)
+{
+	int ret;
+
+	TEST_CONN(1);
+	TEST_CONN(2);
+
+	ret = srv_store_lock(K_NO_WAIT);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_add_by_conn(&test_1_conn);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_add_by_conn(&test_2_conn);
+	zassert_equal(ret, 0);
+
+	struct server_store *retr_server1 = NULL;
+	struct server_store *retr_server2 = NULL;
+
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server1);
+	zassert_equal(ret, 0);
+	zassert_not_null(retr_server1, "Retrieved server should not be NULL");
+	zassert_equal(retr_server1->conn, &test_1_conn,
+		      "Retrieved server connection does not match expected");
+
+	ret = srv_store_from_conn_get(&test_2_conn, &retr_server2);
+	zassert_equal(ret, 0);
+	zassert_not_null(retr_server2, "Retrieved server should not be NULL");
+	zassert_equal(retr_server2->conn, &test_2_conn,
+		      "Retrieved server connection does not match expected");
+
+	TEST_CAP_STREAM(TCS_1_existing, BT_AUDIO_DIR_SINK, 1800, 0xAAAA);
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_min = 1000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_min = 2300;
+	TCS_1_existing.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_1_existing.bap_stream.ep->qos_pref.pd_max = 4000;
+
+	TEST_CAP_STREAM(TCS_2_existing, BT_AUDIO_DIR_SINK, 1800, 0xAAAA);
+	TCS_2_existing.bap_stream.ep->qos_pref.pd_min = 1500;
+	TCS_2_existing.bap_stream.ep->qos_pref.pref_pd_min = 2500;
+	TCS_2_existing.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_2_existing.bap_stream.ep->qos_pref.pd_max = 4000;
+
+	TEST_CAP_STREAM(TCS_3_existing, BT_AUDIO_DIR_SINK, 1800, 0xAAAA);
+	TCS_3_existing.bap_stream.ep->qos_pref.pd_min = 1800;
+	TCS_3_existing.bap_stream.ep->qos_pref.pref_pd_min = 2500;
+	TCS_3_existing.bap_stream.ep->qos_pref.pref_pd_max = 3000;
+	TCS_3_existing.bap_stream.ep->qos_pref.pd_max = 3800;
+
+	memcpy(&retr_server1->snk.cap_streams[0], &TCS_1_existing, sizeof(TCS_1_existing));
+	memcpy(&retr_server1->snk.cap_streams[1], &TCS_2_existing, sizeof(TCS_2_existing));
+	memcpy(&retr_server2->snk.cap_streams[0], &TCS_3_existing, sizeof(TCS_3_existing));
+
+	struct bt_bap_qos_cfg_pref server_qos_pref;
+
+	server_qos_pref.pd_min = 1000;
+	server_qos_pref.pref_pd_min = 1000;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 3000;
+
+	TEST_CAP_STREAM(TCS_1_new, BT_AUDIO_DIR_SINK, 2600, 0xAAAA);
+
+	uint32_t computed_pres_dly_us = 0;
+	uint32_t existing_pres_dly_us = 0;
+	bool group_reconfig_needed = false;
+
+	/* The new stream will have to adhere to the existing group */
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+
+	zassert_equal(ret, 0);
+	zassert_equal(computed_pres_dly_us, 1800, "Presentation delay should be unchanged %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 1800);
+	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
+
+	/* Now change the new incoming stream to force a reconfig based on pref_pd_min*/
+	server_qos_pref.pd_min = 2000;
+	server_qos_pref.pref_pd_min = 2600;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 3000;
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+
+	zassert_equal(ret, 0);
+	zassert_equal(computed_pres_dly_us, 2600, "Presentation delay pref min %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 1800);
+	zassert_equal(group_reconfig_needed, true, "Group reconfiguration should not be needed");
+
+	/* Now change the new incoming stream to force use of pd_min */
+	server_qos_pref.pd_min = 2300;
+	server_qos_pref.pref_pd_min = 2300;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 3000;
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+
+	zassert_equal(ret, 0);
+	zassert_equal(computed_pres_dly_us, 2500, "Presentation delay pref min %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 1800);
+	zassert_equal(group_reconfig_needed, true, "Group reconfiguration should not be needed");
+
+	/* Now min of new stream == max of running streams */
+	server_qos_pref.pd_min = 3800;
+	server_qos_pref.pref_pd_min = 4000;
+	server_qos_pref.pref_pd_max = 5000;
+	server_qos_pref.pd_max = 6000;
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+
+	zassert_equal(ret, 0);
+	zassert_equal(computed_pres_dly_us, 3800, "Presentation delay pref min %d",
+		      computed_pres_dly_us);
+	zassert_equal(existing_pres_dly_us, 1800);
+	zassert_equal(group_reconfig_needed, true, "Group reconfiguration required");
+
+	srv_store_unlock();
+}
+
+ZTEST(suite_server_store, test_pres_delay_multi_group)
+{
+	int ret;
+
+	TEST_CONN(1);
+	TEST_CONN(2);
+
+	ret = srv_store_lock(K_NO_WAIT);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_add_by_conn(&test_1_conn);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_add_by_conn(&test_2_conn);
+	zassert_equal(ret, 0);
+
+	struct server_store *retr_server = NULL;
+
+	ret = srv_store_from_conn_get(&test_1_conn, &retr_server);
+	zassert_equal(ret, 0);
+	zassert_not_null(retr_server, "Retrieved server should not be NULL");
+	zassert_equal(retr_server->conn, &test_1_conn,
+		      "Retrieved server connection does not match expected");
+
+	TEST_CAP_STREAM(TCS_1_existing, BT_AUDIO_DIR_SINK, 2000, 0xAAAA);
+
+	memcpy(&retr_server->snk.cap_streams[0], &TCS_1_existing, sizeof(TCS_1_existing));
+
+	/* Add stream in another group. Should be ignored */
+	TEST_CAP_STREAM(TCS_2_existing, BT_AUDIO_DIR_SINK, 500, 0xBBBB);
+
+	memcpy(&retr_server->snk.cap_streams[1], &TCS_2_existing, sizeof(TCS_2_existing));
+
+	struct bt_bap_qos_cfg_pref server_qos_pref;
+
+	server_qos_pref.pd_min = 1100;
+	server_qos_pref.pref_pd_min = 2100;
+	server_qos_pref.pref_pd_max = 3000;
+	server_qos_pref.pd_max = 4000;
+
+	uint32_t computed_pres_dly_us = 0;
+	uint32_t existing_pres_dly_us = 0;
+	bool group_reconfig_needed = false;
+
+	/* New stream in group AAAA, no change */
+	TEST_CAP_STREAM(TCS_1_new, BT_AUDIO_DIR_SINK, 0, 0xAAAA);
+
+	ret = srv_store_pres_dly_find(&TCS_1_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
 				      &group_reconfig_needed);
 	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
 	zassert_equal(computed_pres_dly_us, 2000, "Presentation delay should be unchanged %d",
 		      computed_pres_dly_us);
 	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
+
+	/* New stream in group BBBB, But other dir. No change  */
+	TEST_CAP_STREAM(TCS_2_new, BT_AUDIO_DIR_SOURCE, 0, 0xBBBB);
+
+	ret = srv_store_pres_dly_find(&TCS_2_new.bap_stream, &computed_pres_dly_us,
+				      &existing_pres_dly_us, &server_qos_pref,
+				      &group_reconfig_needed);
+	zassert_equal(ret, 0, "Finding presentation delay did not return zero %d", ret);
+	zassert_equal(computed_pres_dly_us, 2100, "Presentation delay should be QoS pref min %d",
+		      computed_pres_dly_us);
+	zassert_equal(group_reconfig_needed, false, "Group reconfiguration should not be needed");
+
 	srv_store_unlock();
 }
 
