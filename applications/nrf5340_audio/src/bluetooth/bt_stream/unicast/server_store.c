@@ -424,7 +424,7 @@ static bool pres_dly_compare_stream(struct bt_bap_stream const *const existing_s
 		return false;
 	}
 
-	/* TODO: Add check if we are in QOS configured or higher state */
+	/* TODO: Add check if we are in QOS configured or higher state. Ref. Emil */
 	stream_print(&existing_stream->ep->qos_pref, true, "Existing");
 	return true;
 }
@@ -1208,21 +1208,14 @@ int srv_store_from_conn_get(struct bt_conn const *const conn, struct server_stor
 	return ret;
 }
 
-int srv_store_num_get(bool check_consecutive)
+int srv_store_num_get(void)
 {
 	valid_entry_check(__func__);
 	int num_servers = 0;
-	bool prev_found = true;
 
 	for (int i = 0; i < MAX_SERVERS; i++) {
 		if (!bt_addr_le_eq(&servers[i].addr, NO_ADDR)) {
 			num_servers++;
-			if (!prev_found && check_consecutive) {
-				LOG_ERR("Non-consecutive server storage detected");
-				return -EINVAL;
-			}
-		} else {
-			prev_found = false;
 		}
 	}
 

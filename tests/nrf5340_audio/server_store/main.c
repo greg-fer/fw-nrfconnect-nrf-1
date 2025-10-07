@@ -52,7 +52,7 @@ ZTEST(suite_server_store, test_srv_store_init)
 	ret = srv_store_lock(K_NO_WAIT);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 0);
 
 	TEST_CONN(1);
@@ -60,7 +60,7 @@ ZTEST(suite_server_store, test_srv_store_init)
 	ret = srv_store_add_by_conn(&test_1_conn);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 1, "Number of servers should be one after adding a server");
 
 	bt_addr_le_t addr = {.type = BT_ADDR_LE_PUBLIC,
@@ -76,13 +76,13 @@ ZTEST(suite_server_store, test_srv_store_init)
 	exists = srv_store_server_exists(&addr);
 	zassert_true(exists, "Server should not exist for non-added address");
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 2, "Number of servers should be two after adding a server");
 
 	ret = srv_store_remove_all();
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 0);
 
 	srv_store_unlock();
@@ -109,7 +109,7 @@ ZTEST(suite_server_store, test_srv_store_multiple)
 	ret = srv_store_add_by_conn(&test_3_conn);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 3, "Number of servers should be three after adding three servers");
 
 	struct server_store *retr_server = NULL;
@@ -203,24 +203,20 @@ ZTEST(suite_server_store, test_srv_remove)
 	ret = srv_store_add_by_conn(&test_2_conn);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 3, "Number of servers should be three after adding three servers");
 
 	ret = srv_store_remove_by_conn(&test_2_conn);
 	zassert_equal(ret, 0);
 
-	ret = srv_store_num_get(true);
+	ret = srv_store_num_get();
 	zassert_equal(ret, 2, "Number of servers should be two after removing one");
 
 	ret = srv_store_remove_by_conn(&test_0_conn);
 	zassert_equal(ret, 0);
 
-	/* Test with creating a gap in server store. */
-	ret = srv_store_num_get(true);
-	zassert_equal(ret, -EINVAL, "Should return -EINVAL when there is a gap in store");
-
-	ret = srv_store_num_get(false);
-	zassert_equal(ret, 1, "Number of servers should be two after removing one");
+	ret = srv_store_num_get();
+	zassert_equal(ret, 1, "Number of servers should be one after removing one");
 
 	srv_store_unlock();
 }
@@ -805,7 +801,7 @@ ZTEST(suite_server_store, test_assert_no_lock)
 	ztest_set_assert_valid(true);
 
 	/* This should trigger the assertion in valid_entry_check() */
-	(void)srv_store_num_get(true);
+	(void)srv_store_num_get();
 
 	/* Disable assert catching */
 	ztest_set_assert_valid(false);

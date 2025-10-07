@@ -256,15 +256,14 @@ int srv_store_from_conn_get(struct bt_conn const *const conn, struct server_stor
  * @brief	Get the number of stored servers.
  *
  * @note	srv_store_lock() must be called before accessing this function.
+ * @note	Do not iterate through the servers, as they may not be stored consecutively in
+ * memory. Use the srv_store_foreach_func_t function.
  *
- * @param[in]	check_consecutive  Forces all the servers to be stored consecutively.
- * I.e. if the returned value is used as an iterator, all the servers must be stored consecutively.
- * If true, the function will return -EINVAL if the servers are not all stored consecutevly.
  *
  * @return	number of servers
  * @return	-EINVAL Non-consecutive server storage detected.
  */
-int srv_store_num_get(bool check_consecutive);
+int srv_store_num_get(void);
 
 /**
  * @brief	Add a server to the storage based on conn.
