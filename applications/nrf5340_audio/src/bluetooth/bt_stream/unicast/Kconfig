@@ -82,7 +82,7 @@ config BT_AUDIO_PRES_DELAY_SRCH_SOURCE
 endchoice
 
 config BT_AUDIO_PAC_REC_PRINT
-	bool "Print discovered published audio capabilities"
+	bool "Print discovered Published Audio Capabilities"
 	default n
 	help
 	  Print the supported capabilities of a unicast server when it is discovered.
