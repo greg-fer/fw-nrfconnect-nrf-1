@@ -666,7 +666,7 @@ static void endpoint_cb(struct bt_conn *conn, enum bt_audio_dir dir, struct bt_b
 		return;
 	}
 
-	if (ep != NULL) {
+	if (ep == NULL) {
 		if (dir == BT_AUDIO_DIR_SINK && server->snk.eps[0] == NULL) {
 			LOG_WRN("No sink endpoints found");
 		}
