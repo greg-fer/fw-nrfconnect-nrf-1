@@ -796,31 +796,6 @@ ZTEST(suite_server_store, test_preset_pref)
 	srv_store_unlock();
 }
 
-void before_fn(void *dummy)
-{
-	int ret;
-
-	ret = srv_store_lock(K_NO_WAIT);
-	zassert_equal(ret, 0);
-
-	ret = srv_store_init();
-	zassert_equal(ret, 0);
-	srv_store_unlock();
-}
-
-void after_fn(void *dummy)
-{
-	int ret;
-
-	ret = srv_store_lock(K_NO_WAIT);
-	zassert_equal(ret, 0);
-
-	ret = srv_store_remove_all();
-	zassert_equal(ret, 0);
-
-	srv_store_unlock();
-}
-
 /* Test that calling functions without lock triggers assertions */
 ZTEST(suite_server_store, test_assert_no_lock)
 {
@@ -1072,6 +1047,31 @@ ZTEST(suite_server_store, test_ep_count)
 
 	ret = srv_store_all_ep_state_count(BT_BAP_EP_STATE_QOS_CONFIGURED, BT_AUDIO_DIR_SINK);
 	zassert_equal(ret, 1);
+
+	srv_store_unlock();
+}
+
+void before_fn(void *dummy)
+{
+	int ret;
+
+	ret = srv_store_lock(K_NO_WAIT);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_init();
+	zassert_equal(ret, 0);
+	srv_store_unlock();
+}
+
+void after_fn(void *dummy)
+{
+	int ret;
+
+	ret = srv_store_lock(K_NO_WAIT);
+	zassert_equal(ret, 0);
+
+	ret = srv_store_remove_all();
+	zassert_equal(ret, 0);
 
 	srv_store_unlock();
 }

@@ -27,7 +27,6 @@ struct unicast_server_snk_vars {
 	struct bt_bap_ep *eps[CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SNK_COUNT];
 	size_t num_eps;
 	enum bt_audio_context supported_ctx;
-	/* Check this before calling unicast audio start */
 	enum bt_audio_context available_ctx;
 	/* We should have all info here. (Locations, stream status etc.) */
 	struct bt_cap_stream cap_streams[CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SNK_COUNT];
@@ -93,7 +92,7 @@ int srv_store_foreach_server(srv_store_foreach_func_t func, void *user_data);
  * @param existing  Pointer to the existing codec configuration.
  * @param pref_sample_rate_value  Preferred sample rate value.
  *
- * @return true if the preset should overwrite the existing one, false otherwise.
+ * @return true if the new preset should overwrite the existing one, false otherwise.
  */
 bool srv_store_preset_validated(struct bt_audio_codec_cfg *new, struct bt_audio_codec_cfg *existing,
 				uint8_t pref_sample_rate_value);

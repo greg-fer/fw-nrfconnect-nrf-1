@@ -42,3 +42,11 @@ config LC3_BITRATE_MAX
 config AUDIO_FRAME_DURATION_US
 	int "Audio frame duration in microseconds"
 	default 10000
+
+config BT_AUDIO_PREF_SINK_SAMPLE_RATE_VALUE
+	int "Preferred sink sample rate value"
+	default 8
+
+config BT_AUDIO_PREF_SOURCE_SAMPLE_RATE_VALUE
+	int "Preferred source sample rate value"
+	default 8
