@@ -134,6 +134,7 @@ int srv_store_pres_dly_find(struct bt_bap_stream *stream, uint32_t *computed_pre
  *
  * @return	0 on success.
  * @return	-ENOENT Server not found.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_location_set(struct bt_conn const *const conn, enum bt_audio_dir dir,
 			   enum bt_audio_location loc);
@@ -151,6 +152,7 @@ int srv_store_location_set(struct bt_conn const *const conn, enum bt_audio_dir d
  *
  * @return	0 on success.
  * @return	-ENOENT Server not found.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_valid_codec_cap_check(struct bt_conn const *const conn, enum bt_audio_dir dir,
 				    uint32_t *valid_codec_caps,
@@ -180,6 +182,7 @@ int srv_store_from_stream_get(struct bt_bap_stream const *const stream,
  * @param[in] dir   Direction to filter on.
  *
  * @return	Number of endpoints in the given state and direction.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_all_ep_state_count(enum bt_bap_ep_state state, enum bt_audio_dir dir);
 
@@ -211,6 +214,7 @@ int srv_store_avail_context_set(struct bt_conn *conn, enum bt_audio_context snk_
  * @return	0 on success.
  * @return	-EINVAL Illegal argument(s)
  * @return	-ENOMEM Out of memory.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_codec_cap_set(struct bt_conn const *const conn, enum bt_audio_dir dir,
 			    struct bt_audio_codec_cap const *const codec);
@@ -249,6 +253,7 @@ bool srv_store_server_exists(bt_addr_le_t const *const addr);
  *
  * @return	0 on success.
  * @return	-ENOENT Server not found in storage.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_from_conn_get(struct bt_conn const *const conn, struct server_store **server);
 
@@ -325,6 +330,7 @@ int srv_store_conn_update(struct bt_conn *conn, bt_addr_le_t const *const addr);
  * before accessing this function.
  *
  * @return 0 on success, negative error code on failure.
+ * @return	-ENOTCONN Server conn is NULL.
  */
 int srv_store_clear_by_conn(struct bt_conn const *const conn);
 

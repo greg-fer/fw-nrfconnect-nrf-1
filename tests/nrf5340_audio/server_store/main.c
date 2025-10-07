@@ -910,10 +910,35 @@ ZTEST(suite_server_store, test_clear)
 	zassert_equal(ret, 0);
 
 	ret = srv_store_from_conn_get(&test_1_conn, &server_out);
-	zassert_equal(ret, 0);
+	zassert_equal(ret, -ENOTCONN);
 
 	ret = srv_store_from_addr_get(addr, &server_out);
 	zassert_equal(ret, 0);
+
+	uint8_t zeros[sizeof(struct server_store)] = {0};
+
+	/* Address is not cleared */
+	zassert_str_equal(server_out->name, "NOT_SET");
+	zassert_is_null(server_out->conn);
+	zassert_is_null(server_out->member);
+	zassert_false(server_out->snk.waiting_for_disc);
+	zassert_false(server_out->src.waiting_for_disc);
+	zassert_equal(server_out->snk.locations, 0);
+	zassert_equal(server_out->src.locations, 0);
+	zassert_mem_equal(&server_out->snk.lc3_preset, zeros, sizeof(server_out->snk.lc3_preset));
+	zassert_mem_equal(&server_out->src.lc3_preset, zeros, sizeof(server_out->src.lc3_preset));
+	zassert_mem_equal(&server_out->snk.codec_caps, zeros, sizeof(server_out->snk.codec_caps));
+	zassert_mem_equal(&server_out->src.codec_caps, zeros, sizeof(server_out->src.codec_caps));
+	zassert_equal(server_out->snk.num_codec_caps, 0);
+	zassert_equal(server_out->src.num_codec_caps, 0);
+	zassert_mem_equal((&server_out->snk.eps), zeros, sizeof(server_out->snk.eps));
+	zassert_mem_equal((&server_out->src.eps), zeros, sizeof(server_out->src.eps));
+	zassert_equal(server_out->snk.num_eps, 0);
+	zassert_equal(server_out->src.num_eps, 0);
+	zassert_equal(server_out->snk.supported_ctx, 0);
+	zassert_equal(server_out->src.supported_ctx, 0);
+	zassert_equal(server_out->snk.available_ctx, 0);
+	zassert_equal(server_out->src.available_ctx, 0);
 
 	ret = srv_store_remove_by_addr(addr);
 	zassert_equal(ret, 0);

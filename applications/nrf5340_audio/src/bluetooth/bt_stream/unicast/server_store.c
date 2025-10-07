@@ -386,7 +386,7 @@ static void done_print(uint8_t existing_streams_checked,
 		strcpy(buf, "No common value");
 	}
 
-	LOG_INF("Outcome \t\t abs min: %05u pref min: %05u pref max: %05u  abs max: %05u\n"
+	LOG_INF("Outcome \t\t abs min: %05u pref min: %05u pref max: %05u  abs max: %05u\r\n"
 		"\t selected: %s us, existing: %u us, 1 incoming + %d existing stream(s) "
 		"compared.",
 		common_qos->pd_min, common_qos->pref_pd_min, common_qos->pref_pd_max,
@@ -410,7 +410,6 @@ static bool pres_dly_compare_stream(struct bt_bap_stream const *const existing_s
 
 	if (existing_stream == stream_in) {
 		/* The existing stream is the same as the incoming stream */
-		LOG_ERR("Existing stream is the same as incoming stream");
 		return false;
 	}
 
@@ -442,6 +441,12 @@ static int srv_store_from_conn_get_internal(struct bt_conn const *const conn,
 		bt_addr_le_to_str(peer_addr, peer_str, BT_ADDR_LE_STR_LEN);
 
 		if (bt_addr_le_eq(&servers[i].addr, bt_conn_get_dst(conn))) {
+			if (servers[i].conn == NULL) {
+				LOG_WRN("Server %s has no connection", local_str);
+				*server = NULL;
+				return -ENOTCONN;
+			}
+
 			*server = &servers[i];
 			return 0;
 		}
@@ -1350,7 +1355,10 @@ int srv_store_clear_by_conn(struct bt_conn const *const conn)
 	struct server_store *server = NULL;
 
 	ret = srv_store_from_conn_get_internal(conn, &server);
-	if (ret < 0) {
+
+	if (ret == -ENOENT) {
+		return 0;
+	} else if (ret) {
 		return ret;
 	}
 
@@ -1359,20 +1367,27 @@ int srv_store_clear_by_conn(struct bt_conn const *const conn)
 	server->conn = NULL;
 	server->member = NULL;
 
-	memset(&server->snk.eps, 0, sizeof(server->snk.eps));
-	memset(&server->src.eps, 0, sizeof(server->src.eps));
+	server->snk.waiting_for_disc = false;
+	server->src.waiting_for_disc = false;
+	server->snk.locations = 0;
+	server->src.locations = 0;
 	memset(&server->snk.lc3_preset, 0, sizeof(server->snk.lc3_preset));
 	memset(&server->src.lc3_preset, 0, sizeof(server->src.lc3_preset));
 	memset(&server->snk.codec_caps, 0, sizeof(server->snk.codec_caps));
 	memset(&server->src.codec_caps, 0, sizeof(server->src.codec_caps));
 	server->snk.num_codec_caps = 0;
 	server->src.num_codec_caps = 0;
+	memset(&server->snk.eps, 0, sizeof(server->snk.eps));
+	memset(&server->src.eps, 0, sizeof(server->src.eps));
 	server->snk.num_eps = 0;
 	server->src.num_eps = 0;
-	server->snk.locations = 0;
-	server->src.locations = 0;
-	server->snk.waiting_for_disc = false;
-	server->src.waiting_for_disc = false;
+	server->snk.supported_ctx = 0;
+	server->src.supported_ctx = 0;
+	server->snk.available_ctx = 0;
+	server->src.available_ctx = 0;
+	/* Streams are not touched as these are handled by the stack.
+	 * Clearing them here may lead to faults as they are needed beyond ACL disconnection
+	 */
 
 	return 0;
 }
