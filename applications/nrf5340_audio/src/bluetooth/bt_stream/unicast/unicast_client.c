@@ -1276,9 +1276,18 @@ static struct bt_cap_initiator_cb cap_cbs = {
 	.unicast_stop_complete = unicast_stop_complete_cb,
 };
 
-int le_audio_concurrent_sync_num_get(void)
+int le_audio_concurrent_sync_num_get(uint8_t *num_streams, enum bt_audio_location *locations)
 {
-	return 1; /* Only one stream supported at the moment */
+	if (num_streams == NULL || locations == NULL) {
+		return -EINVAL;
+	}
+
+	/* Only one stream supported at the moment */
+	*num_streams = 1;
+	/* No specific location information needed, must be populated if num_streams > 1 */
+	*locations = 0;
+
+	return 0;
 }
 
 int unicast_client_config_get(struct bt_bap_stream *stream, uint32_t *bitrate,

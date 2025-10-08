@@ -457,9 +457,37 @@ static struct bt_bap_stream_ops stream_ops = {
 	.released = stream_released_cb,
 };
 
-int le_audio_concurrent_sync_num_get(void)
+int le_audio_concurrent_sync_num_get(uint8_t *num_streams, enum bt_audio_location *locations)
 {
-	return concurrent_sync_num; /* Only one stream supported at the moment */
+	int ret;
+
+	if (num_streams == NULL || locations == NULL) {
+		LOG_ERR("Invalid input parameters");
+		return -EINVAL;
+	}
+
+	*num_streams = concurrent_sync_num;
+	*locations = 0;
+
+	for (int i = 0; i < ARRAY_SIZE(cap_audio_streams); i++) {
+		if (cap_audio_streams[i].bap_stream.conn) {
+			if (cap_audio_streams[i].bap_stream.codec_cfg) {
+				enum bt_audio_location chan_allocation;
+
+				ret = bt_audio_codec_cfg_get_chan_allocation(
+					cap_audio_streams[i].bap_stream.codec_cfg, &chan_allocation,
+					false);
+				if (ret) {
+					LOG_WRN("Failed to get channel allocation");
+					return ret;
+				}
+
+				*locations |= chan_allocation;
+			}
+		}
+	}
+
+	return 0;
 }
 
 int unicast_server_config_get(struct bt_conn *conn, enum bt_audio_dir dir, uint32_t *bitrate,
