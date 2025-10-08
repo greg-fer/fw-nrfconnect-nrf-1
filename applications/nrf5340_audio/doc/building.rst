@@ -68,9 +68,9 @@ When preparing the JSON file, update the following fields:
   You can check this ten-digit number on the sticker on the nRF5340 Audio development kit.
   Alternatively, connect the development kit to your PC and run ``nrfutil device list`` in a command window to print the SEGGER serial number of all connected kits.
 * ``nrf5340_audio_dk_dev`` - This field assigns the specific nRF5340 Audio development kit to be ``headset`` or ``gateway``.
-* ``channel`` - This field is valid only for headsets.
-  It sets the channels on which the headset is meant to work.
-  When no channel is set, the headset is programmed as a left channel one.
+* ``location`` - This field is valid only for headsets.
+  It sets the location on which the headset is meant to work, especially when using the :ref:`default CIS transport mode configuration <nrf53_audio_transport_mode_configuration>`.
+  For more information, see :ref:`nrf53_audio_app_configuration_headset_location`.
 
 .. _nrf53_audio_app_building_script_running:
 
@@ -302,25 +302,35 @@ The following command example builds the application for :ref:`nrf53_audio_app_f
 The command uses ``-DFILE_SUFFIX=fota`` to pick :file:`prj_fota.conf` instead of the default :file:`prj.conf`.
 It also uses the ``--pristine`` to clean the existing directory before starting the build process.
 
+.. _nrf53_audio_app_building_standard_programming:
+
 Programming the application
 ===========================
 
 After building the files for the development kit you want to program, follow the :ref:`standard procedure for programming applications <building>` in the |NCS|.
 
-When using the default CIS configuration, if you want to use two headset devices, you must also populate the UICR with the desired channel for each headset.
-Use the following commands, depending on which headset you want to populate:
+When using the :ref:`default CIS transport mode configuration <nrf53_audio_transport_mode_configuration>`, if you want to use two headset devices or the stereo configuration, you must :ref:`configure the headset location <nrf53_audio_app_configuration_headset_location>`.
+Use the combined bitfield values, depending on which headset you want to configure:
 
-* Left headset (``--value 0``):
+* Two headsets, left and right:
 
-   .. code-block:: console
+  * Left headset (``--value 1``):
 
-      nrfutil device x-write --address 0x00FF80F4 --value 0
+    .. code-block:: console
 
-* Right headset (``--value 1``):
+       nrfutil device x-write --address 0x00FF80F4 --value 1
 
-   .. code-block:: console
+  * Right headset (``--value 2``):
 
-      nrfutil device x-write --address 0x00FF80F4 --value 1
+    .. code-block:: console
+
+       nrfutil device x-write --address 0x00FF80F4 --value 2
+
+* One stereo headset (``--value 3``):
+
+  .. code-block:: console
+
+     nrfutil device x-write --address 0x00FF80F4 --value 3
 
 Select the correct board when prompted with the popup.
 Alternatively, you can add the ``--serial-number`` parameter followed by the SEGGER serial number of the correct board at the end of the ``nrfutil device`` command.
