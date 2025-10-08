@@ -55,6 +55,10 @@ struct pd {
 /* Add a new server */
 static int server_add(struct server_store *server)
 {
+	if (server == NULL) {
+		return -EINVAL;
+	}
+
 	for (int i = 0; i < MAX_SERVERS; i++) {
 		char peer_str[BT_ADDR_LE_STR_LEN];
 
@@ -473,6 +477,8 @@ static int srv_store_from_addr_get_internal(bt_addr_le_t const *const addr,
 
 int srv_store_foreach_server(srv_store_foreach_func_t func, void *user_data)
 {
+	valid_entry_check(__func__);
+
 	if (func == NULL) {
 		return -EINVAL;
 	}
@@ -495,9 +501,12 @@ int srv_store_foreach_server(srv_store_foreach_func_t func, void *user_data)
 	return 0;
 }
 
-bool srv_store_preset_validated(struct bt_audio_codec_cfg *new, struct bt_audio_codec_cfg *existing,
+bool srv_store_preset_validated(struct bt_audio_codec_cfg const *const new,
+				struct bt_audio_codec_cfg const *const existing,
 				uint8_t pref_sample_rate_value)
 {
+	valid_entry_check(__func__);
+
 	int ret;
 
 	if (new == NULL || existing == NULL) {
@@ -939,7 +948,7 @@ int srv_store_from_stream_get(struct bt_bap_stream const *const stream,
 		}
 		for (int i = 0; i < CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SNK_COUNT; i++) {
 
-			LOG_DBG("checking server %d, sink stream %d %p %p", srv_idx, i,
+			LOG_DBG("Checking server %d, sink stream %d %p %p", srv_idx, i,
 				&tmp_server->snk.cap_streams[i].bap_stream, stream);
 
 			if (&tmp_server->snk.cap_streams[i].bap_stream == stream) {
@@ -951,7 +960,7 @@ int srv_store_from_stream_get(struct bt_bap_stream const *const stream,
 			}
 		}
 		for (int i = 0; i < CONFIG_BT_BAP_UNICAST_CLIENT_ASE_SRC_COUNT; i++) {
-			LOG_DBG("checking server %d, source stream %d", srv_idx, i);
+			LOG_DBG("Checking server %d, source stream %d", srv_idx, i);
 			if (&tmp_server->src.cap_streams[i].bap_stream == stream) {
 				*server = tmp_server;
 				LOG_DBG("Found server for source stream %p "
