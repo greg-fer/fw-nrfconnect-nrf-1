@@ -4,6 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+/** @file
+ * @defgroup server_store Storage on unicast client of remote unicast servers.
+ * @{
+ * @brief Helper functions to manage how a unicast client (gateway side) stores the
+ * unicast server(s) (headset side) it is connected to.
+ */
+
 #ifndef _SERVER_STORE_H_
 #define _SERVER_STORE_H_
 
@@ -242,6 +249,7 @@ int srv_store_from_addr_get(bt_addr_le_t const *const addr, struct server_store 
  * @note	srv_store_lock() must be called before accessing this function.
  *
  * @retval	true if the server exists, false otherwise.
+ * @retval	false if the server does not exist.
  */
 bool srv_store_server_exists(bt_addr_le_t const *const addr);
 
@@ -386,7 +394,7 @@ int srv_store_remove_all(void);
  *			or one of the special values K_NO_WAIT and K_FOREVER.
  * @param str		String to log the lock source.
  *
- * @retval 0 lock taken. One can now operate on the server store.
+ * @retval 0 Lock taken. One can now operate on the server store.
  * @retval -EBUSY Returned without waiting.
  * @retval -EAGAIN Waiting period timed out, or the semaphore was reset during the waiting period.
  */
@@ -409,5 +417,9 @@ void srv_store_unlock(void);
  * @retval 0 Success, negative error code on failure.
  */
 int srv_store_init(void);
+
+/**
+ * @}
+ */
 
 #endif /* _SERVER_STORE_H_ */

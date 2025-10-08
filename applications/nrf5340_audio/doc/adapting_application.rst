@@ -8,7 +8,11 @@ Adapting nRF5340 Audio applications for end products
    :depth: 2
 
 This page describes the relevant configuration sources and lists the steps required for adapting the :ref:`nrf53_audio_app` to end products.
-Note that addresses and other sensitive information is printed for debug purposes, and this information must not be exposed in a final product.
+
+.. note::
+
+   Addresses and other sensitive information are printed for debug purposes.
+   This information must not be exposed in a final product.
 
 Board configuration sources
 ***************************

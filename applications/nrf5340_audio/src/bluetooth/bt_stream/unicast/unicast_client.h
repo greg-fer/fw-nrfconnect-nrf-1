@@ -4,6 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+/** @file
+ * @defgroup unicast_client Functions for unicast client functionality.
+ * @{
+ * @brief Helper functions to manage unicast client (gateway side) functionality.
+ */
+
 #ifndef _UNICAST_CLIENT_H_
 #define _UNICAST_CLIENT_H_
 
@@ -140,5 +146,9 @@ int unicast_client_disable(uint8_t cig_index);
  * @return	0 for success, error otherwise.
  */
 int unicast_client_enable(uint8_t cig_index, le_audio_receive_cb recv_cb);
+
+/**
+ * @}
+ */
 
 #endif /* _UNICAST_CLIENT_H_ */
