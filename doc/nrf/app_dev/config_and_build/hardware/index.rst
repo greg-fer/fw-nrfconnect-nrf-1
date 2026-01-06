@@ -29,5 +29,6 @@ In particular, :ref:`zephyr:set-devicetree-overlays` explains how the base devic
 
    add_new_driver
    add_new_led_example
+   nrfx
    pin_control
    use_gpio_pin_directly
