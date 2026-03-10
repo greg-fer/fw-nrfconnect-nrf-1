@@ -28,11 +28,17 @@ AP-Protect controlled by hardware
    * Devices ship with AP-Protect disabled (debug access open).
    * Used on nRF9160 and older HW build codes of nRF52 Series devices.
 
+   .. figure:: images/ap_protect_hw_flow.svg
+      :alt: AP-Protect controlled by hardware
+
 AP-Protect controlled by hardware and software
    * Protection is controlled by both the ``UICR.APPROTECT`` register and software.
      For the |NCS|, the software side is handled using Kconfig options.
    * Devices ship with AP-Protect enabled (debug access blocked) and it re-enables on every hard reset.
    * Used on nRF53, nRF54L, nRF91x1, and newer HW build codes of nRF52 Series devices.
+
+   .. figure:: images/ap_protect_hwsw_flow.svg
+      :alt: AP-Protect controlled by hardware and software
 
 Secure AP-Protect
    * An additional protection layer for SoCs or SiPs that support `ARM TrustZone`_ and different :ref:`app_boards_spe_nspe`.
@@ -42,6 +48,9 @@ Secure AP-Protect
    * When enabled, it blocks access only to the Secure Processing Environment (SPE), while allowing non-secure debugging.
    * Works alongside standard AP-Protect.
    * Available on nRF5340, nRF54L, and nRF91 Series devices.
+
+   .. figure:: images/secure_ap_protect_flow.svg
+      :alt: Secure AP-Protect
 
 The following figure illustrates the relationship between the implementation types:
 
